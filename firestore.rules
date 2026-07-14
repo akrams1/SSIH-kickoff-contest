@@ -21,7 +21,7 @@ service cloud.firestore {
 
     function isAdmin() {
       return request.auth != null
-             && request.auth.uid == 'REPLACE_WITH_ADMIN_UID';
+             && request.auth.uid == 'oLCpKQT1RNZ9BciPaXdgqhgKYyI2';
     }
 
     // Fail-open: voting is open unless the config doc explicitly says open:false.
