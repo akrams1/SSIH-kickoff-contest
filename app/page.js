@@ -1,0 +1,179 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Lock, Shirt, Trophy, X, Maximize2 } from 'lucide-react';
+import { Dancing_Script } from 'next/font/google';
+
+const dancingScript = Dancing_Script({
+  subsets: ['latin'],
+  weight: '700',
+});
+
+export default function Home() {
+  const [qrCodeURL, setQrCodeURL] = useState('');
+  const [sparks, setSparks] = useState([]);
+  const [mounted, setMounted] = useState(false);
+  const [showBigQR, setShowBigQR] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    setMounted(true);
+    const landingURL = window.location.origin;
+    const qrAPI = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&color=15803d&bgcolor=ffffff&data=${encodeURIComponent(landingURL)}`;
+    setQrCodeURL(qrAPI);
+
+    const newSparks = Array.from({ length: 50 }).map((_, i) => ({
+      id: i,
+      top: `${Math.random() * 100}%`,
+      left: `${Math.random() * 100}%`,
+      size: Math.random() * 3 + 1,
+      duration: Math.random() * 3 + 2,
+      delay: Math.random() * 2,
+    }));
+    setSparks(newSparks);
+  }, []);
+
+  const handleStart = (e) => {
+    e.preventDefault();
+    setTimeout(() => {
+      router.push('/vote');
+    }, 100);
+  };
+
+  if (!mounted) return <div className="min-h-screen bg-slate-50" />;
+
+  return (
+    <div className="min-h-screen bg-slate-50 relative overflow-hidden flex flex-col items-center justify-center p-6">
+
+      {/* --- BACKGROUND LAYERS (GREEN / GOLD) --- */}
+      <motion.div
+        animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0], x: [0, 50, 0], y: [0, -50, 0] }}
+        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+        className="absolute top-0 left-0 w-[500px] h-[500px] bg-green-100 rounded-full mix-blend-multiply filter blur-3xl opacity-40 z-0"
+      />
+      <motion.div
+        animate={{ scale: [1, 1.1, 1], rotate: [0, -60, 0], x: [0, -30, 0], y: [0, 50, 0] }}
+        transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+        className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-yellow-100 rounded-full mix-blend-multiply filter blur-3xl opacity-40 z-0"
+      />
+
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        {sparks.map((spark) => (
+          <motion.div
+            key={spark.id}
+            className="absolute rounded-full bg-yellow-300"
+            style={{ top: spark.top, left: spark.left, width: spark.size, height: spark.size }}
+            animate={{ opacity: [0.2, 0.8, 0.2], scale: [1, 1.2, 1] }}
+            transition={{ duration: spark.duration, delay: spark.delay, repeat: Infinity, ease: "easeInOut" }}
+          />
+        ))}
+      </div>
+
+      <div className="max-w-md w-full relative z-10">
+        <div className="bg-white/70 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white/50 p-10 text-center flex flex-col items-center">
+
+          {/* 👕 Icon */}
+          <div className="bg-gradient-to-tr from-green-50 to-yellow-50 p-6 rounded-full mb-8 shadow-inner select-none">
+            <Shirt className="w-12 h-12 text-green-600 fill-green-100" />
+          </div>
+
+          <h1 className={`${dancingScript.className} text-6xl font-bold text-green-700 mb-3 drop-shadow-sm`}>
+            Costume Contest
+          </h1>
+
+          <p className="text-lg text-slate-500 font-medium mb-2 uppercase tracking-widest">
+            SSIH Summer Kick Off &rsquo;26
+          </p>
+          <p className="text-xl text-slate-400 font-medium mb-12">
+            Best fit wins. Cast your vote.
+          </p>
+
+          {/* 🟢 BUTTON 🟢 */}
+          <div className="w-full mb-10 px-4">
+            <button
+              onClick={handleStart}
+              className="
+                group relative w-full
+                bg-green-600 hover:bg-green-600
+                text-white font-bold text-2xl
+                py-5 rounded-2xl
+                shadow-[0_10px_0_#15803d,0_15px_20px_rgba(0,0,0,0.15)]
+                active:shadow-[0_0px_0_#15803d]
+                active:translate-y-[10px]
+                active:transition-none
+                transition-all duration-100
+                flex items-center justify-center gap-3
+                select-none
+              "
+            >
+              <Trophy className="w-8 h-8 text-yellow-300" />
+              LET&rsquo;S VOTE
+            </button>
+          </div>
+
+          {/* 📱 QR Code */}
+          <div
+            onClick={() => setShowBigQR(true)}
+            className="mb-8 p-1 bg-white rounded-3xl border border-slate-100 shadow-sm relative group cursor-pointer hover:scale-105 transition-transform"
+          >
+            <div className="bg-slate-50 p-4 rounded-[1.3rem] overflow-hidden">
+                {qrCodeURL ? (
+                  <img src={qrCodeURL} alt="Join Contest QR" className="w-40 h-40 mx-auto rounded-lg opacity-90" />
+                ) : (
+                  <div className="w-40 h-40 bg-slate-100 animate-pulse rounded-xl mx-auto" />
+                )}
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-white/20 rounded-3xl">
+                <Maximize2 className="w-8 h-8 text-slate-500" />
+            </div>
+            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-white px-3 py-1 rounded-full shadow-sm border border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+              Project Fullscreen
+            </div>
+          </div>
+
+          {/* 🔒 Admin Link */}
+          <div className="w-full pt-4">
+            <Link href="/admin">
+              <button className="text-slate-300 text-xs font-bold flex items-center justify-center gap-2 mx-auto px-4 py-2 rounded-full hover:bg-slate-50 transition-colors uppercase tracking-wider">
+                <Lock className="w-3 h-3" />
+                Admin Access
+              </button>
+            </Link>
+          </div>
+
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {showBigQR && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-green-950/95 backdrop-blur-md flex flex-col items-center justify-center p-8 cursor-zoom-out"
+            onClick={() => setShowBigQR(false)}
+          >
+            <button className="absolute top-8 right-8 text-white/50 hover:text-white transition-colors p-2 bg-white/10 rounded-full">
+               <X className="w-8 h-8" />
+            </button>
+            <motion.div
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.8 }}
+              className="bg-white p-6 rounded-3xl shadow-2xl max-w-2xl w-full aspect-square flex items-center justify-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+                <img src={qrCodeURL.replace('300x300', '1000x1000')} alt="Big QR Code" className="w-full h-full object-contain rendering-pixelated" />
+            </motion.div>
+            <div className="mt-8 text-center">
+                <h2 className={`${dancingScript.className} text-6xl text-yellow-400 mb-2`}>Scan to Vote</h2>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}

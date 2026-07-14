@@ -1,0 +1,64 @@
+rules_version = '2';
+
+// ============================================================================
+//  Firestore Security Rules  —  SSIH Kick Off Costume Contest
+// ============================================================================
+//  Casual, zero-friction event. Voters are NOT signed in.
+//   - A voter may ONLY bump a costume's `votes` by exactly +1, and only while
+//     voting is open. They cannot set votes to 99999, rename, create, or delete.
+//   - Add / edit / delete entries and open/close voting require the organizer
+//     to be signed in as the admin account (Firebase Email/Password).
+//
+//  Accepted tradeoff: someone who fully wipes site data can vote again, and a
+//  scripted loop of +1 writes is possible. Fine for a fun dorm prize.
+//
+//  SETUP: replace ADMIN_UID below with your admin user's UID
+//  (Firebase Console -> Authentication -> Users -> copy User UID).
+// ============================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+             && request.auth.uid == 'REPLACE_WITH_ADMIN_UID';
+    }
+
+    // Fail-open: voting is open unless the config doc explicitly says open:false.
+    // A missing config doc never locks people out.
+    function votingOpen() {
+      return !exists(/databases/$(database)/documents/config/event)
+             || get(/databases/$(database)/documents/config/event).data.open != false;
+    }
+
+    match /contestants/{id} {
+
+      // A vote = ONLY `votes` changed, it's an int, and it went up by exactly 1.
+      function isSingleVote() {
+        return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['votes'])
+               && request.resource.data.votes is int
+               && request.resource.data.votes == resource.data.votes + 1;
+      }
+
+      allow read: if true;
+
+      // Anyone may cast a single vote while voting is open; admin may do anything.
+      allow update: if (isSingleVote() && votingOpen()) || isAdmin();
+
+      // Only the admin adds or removes entries.
+      allow create, delete: if isAdmin();
+    }
+
+    // Event config (voting open/closed). Public read so voters see "closed";
+    // only the admin can flip it.
+    match /config/{doc} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Everything else denied.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
