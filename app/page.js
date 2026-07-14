@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Shirt, Trophy, X, Maximize2 } from 'lucide-react';
+import { Lock, Trophy, X, Maximize2 } from 'lucide-react';
 import { Dancing_Script } from 'next/font/google';
 
 const dancingScript = Dancing_Script({
@@ -75,20 +75,17 @@ export default function Home() {
       <div className="max-w-md w-full relative z-10">
         <div className="bg-white/70 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white/50 p-10 text-center flex flex-col items-center">
 
-          {/* 👕 Icon */}
-          <div className="bg-gradient-to-tr from-green-50 to-yellow-50 p-6 rounded-full mb-8 shadow-inner select-none">
-            <Shirt className="w-12 h-12 text-green-600 fill-green-100" />
-          </div>
+          {/* Event title lockup */}
+          <img
+            src="/kickoff-title.webp"
+            alt="SSIH Summer Kick Off '26 — End of Semester Party"
+            width={1000}
+            height={733}
+            className="w-full max-w-sm mx-auto mb-6 select-none"
+          />
 
-          <h1 className={`${dancingScript.className} text-6xl font-bold text-green-700 mb-3 drop-shadow-sm`}>
-            Costume Contest
-          </h1>
-
-          <p className="text-lg text-slate-500 font-medium mb-2 uppercase tracking-widest">
-            SSIH Summer Kick Off &rsquo;26
-          </p>
           <p className="text-xl text-slate-400 font-medium mb-12">
-            Best fit wins. Cast your vote.
+            Costume Contest &middot; vote for the best fit
           </p>
 
           {/* 🟢 BUTTON 🟢 */}

@@ -5,20 +5,55 @@ import { db } from '@/lib/firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { Crown, Trophy, Medal, Star, Loader2, Sparkles } from 'lucide-react';
-import { Dancing_Script } from 'next/font/google';
+import { Trophy, Loader2 } from 'lucide-react';
+import { Bebas_Neue } from 'next/font/google';
 import { rankSort } from '@/lib/rank';
 import { cldThumb } from '@/lib/img';
 
-const dancingScript = Dancing_Script({ subsets: ['latin'], weight: '700' });
+const bebas = Bebas_Neue({ subsets: ['latin'], weight: '400' });
+
+// Faint chalk pitch markings — the one ambient layer. Kept low-contrast so it
+// reads as texture, never decoration competing with the standings.
+function PitchLines() {
+  return (
+    <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <g fill="none" stroke="#15803d" strokeOpacity="0.08" strokeWidth="2">
+        <line x1="0" y1="50%" x2="100%" y2="50%" />
+        <circle cx="50%" cy="50%" r="120" />
+        <circle cx="50%" cy="50%" r="4" fill="#15803d" fillOpacity="0.12" stroke="none" />
+      </g>
+    </svg>
+  );
+}
+
+// One player's block on the podium. `size` drives the winner emphasis.
+function PodiumPlayer({ player, rank, size }) {
+  const winner = rank === 1;
+  const dims = size === 'lg' ? 'w-32 h-32 md:w-40 md:h-40' : 'w-20 h-20 md:w-24 md:h-24';
+  return (
+    <div className="flex flex-col items-center text-center">
+      {winner && <Trophy className="w-7 h-7 text-yellow-500 mb-3" strokeWidth={1.75} />}
+      <div className="relative">
+        <div className={`${dims} rounded-full overflow-hidden bg-slate-100 ring-2 ${winner ? 'ring-yellow-400' : 'ring-slate-200'}`}>
+          <img src={cldThumb(player.photoURL, winner ? 400 : 300)} alt={player.name} className="w-full h-full object-cover" />
+        </div>
+        {/* Kit number plate */}
+        <div className={`absolute -bottom-1 -right-1 ${size === 'lg' ? 'w-10 h-10' : 'w-8 h-8'} rounded-full flex items-center justify-center ring-2 ring-slate-50 ${winner ? 'bg-yellow-400 text-slate-900' : 'bg-slate-900 text-white'}`}>
+          <span className={`${bebas.className} ${size === 'lg' ? 'text-xl' : 'text-base'} leading-none pt-0.5`}>{rank}</span>
+        </div>
+      </div>
+      <p className={`mt-4 font-semibold text-slate-800 ${size === 'lg' ? 'text-lg' : 'text-sm'} max-w-[8rem] truncate`}>{player.name}</p>
+      <p className={`${bebas.className} ${size === 'lg' ? 'text-3xl' : 'text-2xl'} text-slate-900 leading-none mt-1`}>{player.votes}</p>
+      <p className="text-[10px] uppercase tracking-widest text-slate-400 mt-0.5">votes</p>
+    </div>
+  );
+}
 
 export default function ResultsPage() {
   const [contestants, setContestants] = useState([]);
   const [loading, setLoading] = useState(true);
-  // Reveal stepper. 0 = curtain. Places reveal bottom-up: the last place first,
-  // the winner last. Total steps = number of podium places (1, 2, or 3).
-  const [step, setStep] = useState(0);
-  const firedConfetti = useRef(false);
+  const [step, setStep] = useState(0); // 0 = kickoff; reveals bottom-up
+  const fired = useRef(false);
 
   useEffect(() => {
     const q = query(collection(db, 'contestants'), orderBy('votes', 'desc'));
@@ -32,25 +67,23 @@ export default function ResultsPage() {
   }, []);
 
   const fireConfetti = () => {
-    if (firedConfetti.current) return;
-    firedConfetti.current = true;
-    const end = Date.now() + 3000;
+    if (fired.current) return;
+    fired.current = true;
+    const end = Date.now() + 2200;
+    const colors = ['#15803d', '#eab308', '#ffffff'];
     const frame = () => {
       if (Date.now() > end) return;
-      confetti({ startVelocity: 30, spread: 360, ticks: 60, particleCount: 40, origin: { x: Math.random() * 0.2 + 0.1, y: Math.random() - 0.2 } });
-      confetti({ startVelocity: 30, spread: 360, ticks: 60, particleCount: 40, origin: { x: Math.random() * 0.2 + 0.7, y: Math.random() - 0.2 } });
+      confetti({ particleCount: 24, angle: 60, spread: 55, origin: { x: 0 }, colors, ticks: 70 });
+      confetti({ particleCount: 24, angle: 120, spread: 55, origin: { x: 1 }, colors, ticks: 70 });
       requestAnimationFrame(frame);
     };
     frame();
   };
 
-  const podiumLen = Math.min(3, contestants.length); // number of reveal steps
+  const podiumLen = Math.min(3, contestants.length);
   const advance = () => setStep((s) => Math.min(s + 1, podiumLen));
+  const shown = (r) => step >= podiumLen - r; // r: 0 = winner
 
-  // A place at rank index r (0 = winner) is shown once step reaches podiumLen - r.
-  const shown = (r) => step >= podiumLen - r;
-
-  // Fire confetti exactly when the winner (r = 0) becomes visible.
   useEffect(() => {
     if (podiumLen > 0 && step >= podiumLen) fireConfetti();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -58,18 +91,19 @@ export default function ResultsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-green-950 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-yellow-400 animate-spin" />
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <Loader2 className="w-7 h-7 text-green-700 animate-spin" />
       </div>
     );
   }
 
   if (contestants.length === 0) {
     return (
-      <div className="min-h-screen bg-green-950 flex flex-col items-center justify-center text-center px-6">
-        <Trophy className="w-16 h-16 text-yellow-400/60 mb-4" />
-        <h1 className={`${dancingScript.className} text-5xl text-yellow-400`}>No entries yet</h1>
-        <p className="text-green-200/70 mt-2">Add costumes in the admin panel to see results.</p>
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center text-center px-6 relative overflow-hidden">
+        <PitchLines />
+        <p className="relative text-xs uppercase tracking-[0.25em] text-slate-400 mb-3">SSIH Kick Off &rsquo;26</p>
+        <h1 className={`${bebas.className} relative text-6xl text-slate-900`}>No entries yet</h1>
+        <p className="relative text-slate-500 mt-2">Add costumes in the admin panel to kick things off.</p>
       </div>
     );
   }
@@ -77,111 +111,99 @@ export default function ResultsPage() {
   const [first, second, third, ...others] = contestants;
   const revealedAll = step >= podiumLen;
   const topTie = first && second && (first.votes || 0) === (second.votes || 0);
-
-  // Label for the "next" button: name the place that the NEXT tap reveals.
-  const nextRankIndex = podiumLen - (step + 1); // rank index revealed next
-  const nextLabel = nextRankIndex === 0 ? 'Reveal the winner' : nextRankIndex === 1 ? 'Reveal 2nd place' : 'Reveal 3rd place';
+  const nextRank = podiumLen - (step + 1);
+  const nextLabel = nextRank === 0 ? 'Reveal the winner' : nextRank === 1 ? 'Reveal 2nd' : 'Reveal 3rd';
 
   return (
-    <div className="min-h-screen bg-green-950 text-white overflow-x-hidden relative">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-96 bg-emerald-500/30 blur-[100px] rounded-full z-0" />
+    <div className="min-h-screen bg-slate-50 relative overflow-hidden">
+      <PitchLines />
 
-      <div className="relative z-10 max-w-4xl mx-auto px-6 py-12 flex flex-col items-center">
-        <h1 className={`${dancingScript.className} text-6xl md:text-8xl text-yellow-400 mb-4 text-center drop-shadow-[0_5px_5px_rgba(0,0,0,0.5)]`}>
-          The Winners
-        </h1>
+      <div className="relative max-w-3xl mx-auto px-6 py-16">
 
-        {topTie && revealedAll && (
-          <div className="mb-8 text-sm text-yellow-200/80 bg-yellow-400/10 border border-yellow-400/20 rounded-full px-4 py-2 text-center">
-            Tie at the top — broken by earliest entry.
+        {/* Header — scoreboard masthead */}
+        <div className="text-center mb-14">
+          <p className="text-xs uppercase tracking-[0.25em] text-green-700 font-semibold mb-2">
+            SSIH Kick Off &rsquo;26 &middot; Costume Contest
+          </p>
+          <h1 className={`${bebas.className} text-7xl md:text-8xl text-slate-900 leading-none`}>Full Time</h1>
+          <div className="flex items-center justify-center gap-3 mt-3">
+            <span className="h-px w-8 bg-slate-300" />
+            <p className="text-sm uppercase tracking-widest text-slate-500">Final Standings</p>
+            <span className="h-px w-8 bg-slate-300" />
           </div>
-        )}
+        </div>
 
+        {/* Kickoff prompt */}
         {step === 0 && (
-          <motion.button
-            onClick={advance}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="mt-16 mb-24 flex flex-col items-center gap-4 group"
-          >
-            <div className="w-28 h-28 rounded-full bg-yellow-400/10 border-2 border-yellow-400/40 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <Sparkles className="w-12 h-12 text-yellow-400" />
-            </div>
-            <span className="text-yellow-200 font-semibold text-lg uppercase tracking-widest">Tap to reveal</span>
-          </motion.button>
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center py-10">
+            <button
+              onClick={advance}
+              className="group flex flex-col items-center gap-4"
+            >
+              <span className="w-20 h-20 rounded-full border-2 border-green-700/30 flex items-center justify-center group-hover:border-green-700 group-hover:scale-105 transition-all">
+                <span className={`${bebas.className} text-2xl text-green-700`}>GO</span>
+              </span>
+              <span className="text-sm uppercase tracking-widest text-slate-500 group-hover:text-slate-800 transition-colors">Kick off</span>
+            </button>
+          </motion.div>
         )}
 
+        {/* Podium — no pedestals; emphasis by scale, aligned to a chalk baseline */}
         {step >= 1 && (
-          <div className="flex flex-wrap justify-center items-end gap-4 md:gap-8 mb-12 w-full min-h-[16rem]">
-            <AnimatePresence>
-              {second && shown(1) && (
-                <motion.div key="second" initial={{ opacity: 0, y: 60 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center order-1">
-                  <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-slate-300 shadow-2xl overflow-hidden mb-3">
-                    <img src={cldThumb(second.photoURL, 300)} className="w-full h-full object-cover" />
-                  </div>
-                  <div className="bg-green-900 px-6 py-2 rounded-t-xl w-32 md:w-40 text-center border-t-4 border-slate-300 h-32 flex flex-col justify-start pt-4 shadow-lg">
-                    <Medal className="w-8 h-8 mx-auto text-slate-300 mb-2" />
-                    <p className="font-bold text-slate-200 truncate">{second.name}</p>
-                    <p className="text-xs text-green-300">{second.votes} Votes</p>
-                  </div>
-                </motion.div>
-              )}
-
-              {first && shown(0) && (
-                <motion.div key="first" initial={{ opacity: 0, scale: 0.5, y: 60 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ type: 'spring', bounce: 0.5 }} className="flex flex-col items-center order-0 md:order-2 z-20 -mt-12 md:mt-0">
-                  <div className="relative">
-                    <Crown className="w-12 h-12 text-yellow-400 absolute -top-10 left-1/2 -translate-x-1/2 animate-bounce" />
-                    <div className="w-32 h-32 md:w-48 md:h-48 rounded-full border-4 border-yellow-400 shadow-[0_0_30px_rgba(250,204,21,0.4)] overflow-hidden mb-4">
-                      <img src={cldThumb(first.photoURL, 400)} className="w-full h-full object-cover" />
-                    </div>
-                  </div>
-                  <div className="bg-yellow-500 px-6 py-2 rounded-t-xl w-40 md:w-56 text-center border-t-4 border-yellow-300 h-48 flex flex-col justify-start pt-6 shadow-2xl">
-                    <Trophy className="w-10 h-10 mx-auto text-yellow-100 mb-2" />
-                    <p className="font-bold text-white text-xl truncate">{first.name}</p>
-                    <p className="text-sm text-yellow-100 font-bold">{first.votes} Votes</p>
-                  </div>
-                </motion.div>
-              )}
-
-              {third && shown(2) && (
-                <motion.div key="third" initial={{ opacity: 0, y: 60 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center order-2 md:order-3">
-                  <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-amber-500 shadow-2xl overflow-hidden mb-3">
-                    <img src={cldThumb(third.photoURL, 300)} className="w-full h-full object-cover" />
-                  </div>
-                  <div className="bg-green-900 px-6 py-2 rounded-t-xl w-32 md:w-40 text-center border-t-4 border-amber-500 h-24 flex flex-col justify-start pt-4 shadow-lg">
-                    <Medal className="w-8 h-8 mx-auto text-amber-500 mb-2" />
-                    <p className="font-bold text-amber-400 truncate">{third.name}</p>
-                    <p className="text-xs text-green-300">{third.votes} Votes</p>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+          <div className="mb-4">
+            <div className="flex items-end justify-center gap-8 md:gap-14 pb-8 border-b border-slate-200">
+              <AnimatePresence>
+                {second && shown(1) && (
+                  <motion.div key="2" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}>
+                    <PodiumPlayer player={second} rank={2} size="sm" />
+                  </motion.div>
+                )}
+                {first && shown(0) && (
+                  <motion.div key="1" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', bounce: 0.35 }}>
+                    <PodiumPlayer player={first} rank={1} size="lg" />
+                  </motion.div>
+                )}
+                {third && shown(2) && (
+                  <motion.div key="3" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}>
+                    <PodiumPlayer player={third} rank={3} size="sm" />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+            {topTie && revealedAll && (
+              <p className="text-center text-xs text-slate-400 mt-3">Level on votes at the top — separated by earliest entry.</p>
+            )}
           </div>
         )}
 
+        {/* Advance */}
         {step > 0 && !revealedAll && (
-          <button onClick={advance} className="mb-16 bg-yellow-400 hover:bg-yellow-300 text-green-950 font-bold px-8 py-3 rounded-full shadow-lg transition-all active:scale-95 uppercase tracking-wide text-sm">
-            {nextLabel}
-          </button>
+          <div className="flex justify-center mt-8">
+            <button
+              onClick={advance}
+              className="px-7 py-2.5 rounded-full bg-slate-900 text-white text-xs uppercase tracking-widest font-semibold hover:bg-slate-800 transition-colors active:scale-95"
+            >
+              {nextLabel}
+            </button>
+          </div>
         )}
 
+        {/* League table — 4th onward */}
         {revealedAll && others.length > 0 && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-2xl bg-white/5 backdrop-blur-sm rounded-3xl p-6 border border-white/10">
-            <h3 className="text-green-300 text-sm font-bold uppercase tracking-widest mb-4 flex items-center gap-2">
-              <Star className="w-4 h-4" /> Honorable Mentions
-            </h3>
-            {others.map((person, i) => (
-              <div key={person.id} className="flex items-center justify-between py-3 border-b border-white/5 last:border-0">
-                <div className="flex items-center gap-3">
-                  <span className="text-green-400/50 font-mono text-sm w-6">#{i + 4}</span>
-                  <div className="w-10 h-10 rounded-full bg-green-800 overflow-hidden">
-                    <img src={cldThumb(person.photoURL, 100)} className="w-full h-full object-cover" />
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-12">
+            <p className="text-xs uppercase tracking-widest text-slate-400 mb-3 px-1">Also played</p>
+            <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden">
+              {others.map((p, i) => (
+                <div key={p.id} className="flex items-center gap-4 px-4 py-3 border-b border-slate-100 last:border-0">
+                  <span className={`${bebas.className} text-lg text-slate-400 w-6 text-center`}>{i + 4}</span>
+                  <div className="w-9 h-9 rounded-full overflow-hidden bg-slate-100 ring-1 ring-slate-200">
+                    <img src={cldThumb(p.photoURL, 100)} alt={p.name} className="w-full h-full object-cover" />
                   </div>
-                  <span className="font-medium text-slate-200">{person.name}</span>
+                  <span className="flex-1 font-medium text-slate-700 truncate">{p.name}</span>
+                  <span className={`${bebas.className} text-lg text-slate-900`}>{p.votes}</span>
                 </div>
-                <span className="text-green-300/70 text-sm">{person.votes} votes</span>
-              </div>
-            ))}
+              ))}
+            </div>
           </motion.div>
         )}
       </div>
