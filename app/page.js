@@ -78,9 +78,9 @@ export default function Home() {
           {/* Event title lockup */}
           <img
             src="/kickoff-title.webp"
-            alt="SSIH Summer Kick Off '26 — End of Semester Party"
+            alt="SSIH Summer Kick Off '26"
             width={1000}
-            height={733}
+            height={641}
             className="w-full max-w-sm mx-auto mb-6 select-none"
           />
 
