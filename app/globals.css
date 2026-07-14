@@ -12,6 +12,23 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* Pastel sage green — remaps every `green-*` utility across the whole app.
+   Light stops carry the soft pastel feel; 600/700 stay dark enough for
+   white-text buttons (600 = 4.77:1) and headings (700 = 5.93:1). */
+@theme {
+  --color-green-50:  #f2f9f5;
+  --color-green-100: #e2f2ea;
+  --color-green-200: #c9ecd8;
+  --color-green-300: #a6dcbf;
+  --color-green-400: #78c4a0;
+  --color-green-500: #55ac82;
+  --color-green-600: #37805c;
+  --color-green-700: #356f50;
+  --color-green-800: #2b5a42;
+  --color-green-900: #234636;
+  --color-green-950: #10251b;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -23,4 +40,62 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Vote CTA — soft pastel "kick" button. Mint face, deep-green ink, a gentle
+   arcade press. Adapted from Uiverse by btongheng. */
+.vote-btn {
+  --face: #c9ecd8;
+  --edge: #93d6b6;
+  --shadow: #77c8a1;
+  --ink: #15533a;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  padding: 0.9rem 2.6rem;
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--ink);
+  background: var(--face);
+  border: 2px solid var(--edge);
+  border-radius: 0.9rem;
+  box-shadow: 0 7px 0 var(--shadow);
+  transform: skew(-9deg);
+  filter: drop-shadow(0 10px 14px rgba(119, 200, 161, 0.35));
+  transition: transform 0.13s cubic-bezier(0.2, 0.7, 0.3, 1),
+              box-shadow 0.13s cubic-bezier(0.2, 0.7, 0.3, 1),
+              letter-spacing 0.13s ease;
+  will-change: transform;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+}
+.vote-btn:hover {
+  transform: skew(-9deg) translateY(-2px);
+  box-shadow: 0 9px 0 var(--shadow);
+}
+.vote-btn:active {
+  letter-spacing: 0.5px;
+  transform: skew(-9deg) translateY(7px);
+  box-shadow: 0 0 0 var(--shadow);
+  filter: drop-shadow(0 3px 6px rgba(119, 200, 161, 0.3));
+}
+
+/* Subtle, GPU-friendly entrance — opacity + small translate only. */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
+.fade-up {
+  animation: fadeUp 0.5s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-up { animation: none; }
+  .vote-btn,
+  .vote-btn:hover,
+  .vote-btn:active { transition: none; }
 }

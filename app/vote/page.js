@@ -142,13 +142,14 @@ export default function VotePage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {ordered.map((contestant) => {
+            {ordered.map((contestant, idx) => {
               const isMine = votedFor === contestant.id;
               const lockedOut = (!!votedFor && !isMine) || !votingOpen;
               return (
                 <div
                   key={contestant.id}
-                  className={`group bg-white rounded-2xl overflow-hidden shadow-sm border transition-all duration-300 ${
+                  style={{ animationDelay: `${Math.min(idx, 8) * 60}ms` }}
+                  className={`fade-up group bg-white rounded-2xl overflow-hidden shadow-sm border transition-all duration-300 ${
                     isMine ? 'border-green-400 ring-2 ring-green-100' : 'border-slate-100 hover:shadow-xl hover:-translate-y-1'
                   }`}
                 >

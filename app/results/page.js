@@ -17,10 +17,10 @@ const bebas = Bebas_Neue({ subsets: ['latin'], weight: '400' });
 function PitchLines() {
   return (
     <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      <g fill="none" stroke="#15803d" strokeOpacity="0.08" strokeWidth="2">
+      <g fill="none" stroke="#356f50" strokeOpacity="0.08" strokeWidth="2">
         <line x1="0" y1="50%" x2="100%" y2="50%" />
         <circle cx="50%" cy="50%" r="120" />
-        <circle cx="50%" cy="50%" r="4" fill="#15803d" fillOpacity="0.12" stroke="none" />
+        <circle cx="50%" cy="50%" r="4" fill="#356f50" fillOpacity="0.12" stroke="none" />
       </g>
     </svg>
   );
@@ -70,7 +70,7 @@ export default function ResultsPage() {
     if (fired.current) return;
     fired.current = true;
     const end = Date.now() + 2200;
-    const colors = ['#15803d', '#eab308', '#ffffff'];
+    const colors = ['#55ac82', '#eab308', '#ffffff'];
     const frame = () => {
       if (Date.now() > end) return;
       confetti({ particleCount: 24, angle: 60, spread: 55, origin: { x: 0 }, colors, ticks: 70 });
@@ -121,7 +121,7 @@ export default function ResultsPage() {
       <div className="relative max-w-3xl mx-auto px-6 py-16">
 
         {/* Header — scoreboard masthead */}
-        <div className="text-center mb-14">
+        <div className="fade-up text-center mb-14">
           <p className="text-xs uppercase tracking-[0.25em] text-green-700 font-semibold mb-2">
             SSIH Kick Off &rsquo;26 &middot; Costume Contest
           </p>

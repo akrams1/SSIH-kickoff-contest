@@ -14,7 +14,6 @@ const dancingScript = Dancing_Script({
 
 export default function Home() {
   const [qrCodeURL, setQrCodeURL] = useState('');
-  const [sparks, setSparks] = useState([]);
   const [mounted, setMounted] = useState(false);
   const [showBigQR, setShowBigQR] = useState(false);
   const router = useRouter();
@@ -22,18 +21,8 @@ export default function Home() {
   useEffect(() => {
     setMounted(true);
     const landingURL = window.location.origin;
-    const qrAPI = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&color=15803d&bgcolor=ffffff&data=${encodeURIComponent(landingURL)}`;
+    const qrAPI = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&color=356f50&bgcolor=ffffff&data=${encodeURIComponent(landingURL)}`;
     setQrCodeURL(qrAPI);
-
-    const newSparks = Array.from({ length: 50 }).map((_, i) => ({
-      id: i,
-      top: `${Math.random() * 100}%`,
-      left: `${Math.random() * 100}%`,
-      size: Math.random() * 3 + 1,
-      duration: Math.random() * 3 + 2,
-      delay: Math.random() * 2,
-    }));
-    setSparks(newSparks);
   }, []);
 
   const handleStart = (e) => {
@@ -48,32 +37,12 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-slate-50 relative overflow-hidden flex flex-col items-center justify-center p-6">
 
-      {/* --- BACKGROUND LAYERS (GREEN / GOLD) --- */}
-      <motion.div
-        animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0], x: [0, 50, 0], y: [0, -50, 0] }}
-        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-        className="absolute top-0 left-0 w-[500px] h-[500px] bg-green-100 rounded-full mix-blend-multiply filter blur-3xl opacity-40 z-0"
-      />
-      <motion.div
-        animate={{ scale: [1, 1.1, 1], rotate: [0, -60, 0], x: [0, -30, 0], y: [0, 50, 0] }}
-        transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-        className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-yellow-100 rounded-full mix-blend-multiply filter blur-3xl opacity-40 z-0"
-      />
-
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        {sparks.map((spark) => (
-          <motion.div
-            key={spark.id}
-            className="absolute rounded-full bg-yellow-300"
-            style={{ top: spark.top, left: spark.left, width: spark.size, height: spark.size }}
-            animate={{ opacity: [0.2, 0.8, 0.2], scale: [1, 1.2, 1] }}
-            transition={{ duration: spark.duration, delay: spark.delay, repeat: Infinity, ease: "easeInOut" }}
-          />
-        ))}
-      </div>
+      {/* Soft static wash — calm, no continuous animation (mobile-friendly) */}
+      <div className="absolute -top-24 -left-24 w-[460px] h-[460px] bg-green-100 rounded-full blur-3xl opacity-50 z-0 pointer-events-none" />
+      <div className="absolute -bottom-24 -right-24 w-[460px] h-[460px] bg-yellow-100 rounded-full blur-3xl opacity-50 z-0 pointer-events-none" />
 
       <div className="max-w-md w-full relative z-10">
-        <div className="bg-white/70 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white/50 p-10 text-center flex flex-col items-center">
+        <div className="fade-up bg-white/70 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white/50 p-10 text-center flex flex-col items-center">
 
           {/* Event title lockup */}
           <img
@@ -88,25 +57,10 @@ export default function Home() {
             Costume Contest &middot; vote for the best fit
           </p>
 
-          {/* 🟢 BUTTON 🟢 */}
-          <div className="w-full mb-10 px-4">
-            <button
-              onClick={handleStart}
-              className="
-                group relative w-full
-                bg-green-600 hover:bg-green-600
-                text-white font-bold text-2xl
-                py-5 rounded-2xl
-                shadow-[0_10px_0_#15803d,0_15px_20px_rgba(0,0,0,0.15)]
-                active:shadow-[0_0px_0_#15803d]
-                active:translate-y-[10px]
-                active:transition-none
-                transition-all duration-100
-                flex items-center justify-center gap-3
-                select-none
-              "
-            >
-              <Trophy className="w-8 h-8 text-yellow-300" />
+          {/* Vote CTA — arcade kick button */}
+          <div className="w-full mb-12 flex justify-center">
+            <button onClick={handleStart} className="vote-btn select-none">
+              <Trophy className="w-7 h-7 text-yellow-500" />
               LET&rsquo;S VOTE
             </button>
           </div>
