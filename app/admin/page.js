@@ -14,14 +14,17 @@ import Image from 'next/image';
 import Link from 'next/link';
 import {
   ArrowLeft, Trash2, Trophy, Loader2, Medal, UploadCloud, Plus, Edit2, Save, X,
-  CheckCircle, AlertCircle, Lock, Mail, KeyRound, LogOut, DoorOpen, DoorClosed
+  CheckCircle, AlertCircle, Lock, KeyRound, LogOut, DoorOpen, DoorClosed
 } from 'lucide-react';
 
+// Passkey login, backed by ONE hidden Firebase account so the rules stay
+// enforceable. The admin only ever types the passkey; this fixed email is the
+// account it signs into behind the scenes. Not a secret (the passkey is).
+const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'admin@ssih-kickoff.web.app';
+
 export default function AdminPage() {
-  // --- Real auth (Firebase email/password) ---
   const [user, setUser] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState('');
   const [signingIn, setSigningIn] = useState(false);
@@ -72,10 +75,10 @@ export default function AdminPage() {
     setAuthError('');
     setSigningIn(true);
     try {
-      await signInWithEmailAndPassword(auth, email.trim(), password);
+      await signInWithEmailAndPassword(auth, ADMIN_EMAIL, password);
     } catch (err) {
       console.error('Auth error:', err.code);
-      setAuthError('Invalid email or password.');
+      setAuthError('Incorrect passkey.');
     } finally {
       setSigningIn(false);
     }
@@ -190,21 +193,15 @@ export default function AdminPage() {
             <div className="bg-green-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
               <Lock className="w-8 h-8 text-green-600" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-700 mb-2">Admin Sign In</h1>
+            <h1 className="text-2xl font-bold text-slate-700 mb-2">Enter Passkey</h1>
             <p className="text-slate-400 mb-8 text-sm">Organizer access only.</p>
 
             <form onSubmit={handleSignIn} className="space-y-4">
               <div className="relative">
-                <Mail className="absolute left-4 top-3.5 w-5 h-5 text-slate-300" />
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl outline-none transition-all placeholder:text-slate-300 text-slate-700 font-medium focus:border-green-400 focus:ring-2 focus:ring-green-100"
-                  placeholder="Email" autoComplete="username" />
-              </div>
-              <div className="relative">
                 <KeyRound className="absolute left-4 top-3.5 w-5 h-5 text-slate-300" />
                 <input type="password" value={password} onChange={(e) => setPassword(e.target.value)}
                   className={`w-full pl-12 pr-4 py-3 bg-white border rounded-xl outline-none transition-all placeholder:text-slate-300 text-slate-700 font-medium ${authError ? 'border-red-300 ring-2 ring-red-100' : 'border-slate-200 focus:border-green-400 focus:ring-2 focus:ring-green-100'}`}
-                  placeholder="Password" autoComplete="current-password" />
+                  placeholder="Passkey" autoComplete="current-password" autoFocus />
               </div>
 
               {authError && (

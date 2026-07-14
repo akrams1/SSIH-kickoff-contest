@@ -25,11 +25,22 @@ browser — they are NOT secrets; security lives in firestore.rules).
     event's entries show up.
 
 --------------------------------------------------------------------------------
-## 2. Admin auth (makes the lock real)
+## 2. Admin passkey (shared by all organizers)
+
+Admins unlock `/admin` by typing a shared PASSKEY. Behind the scenes that passkey
+is the password of ONE hidden Firebase account, so the security rules still work.
+Every organizer types the same passkey -> same account -> full access. No per-person
+accounts to manage.
 
   1. Firebase Console -> Authentication -> enable "Email/Password".
-  2. Authentication -> Users -> Add user. Create ONE organizer account.
-  3. Copy that user's User UID.
+  2. Authentication -> Users -> Add user. Use EXACTLY the email in
+     NEXT_PUBLIC_ADMIN_EMAIL (default admin@ssih-kickoff.web.app), and set its
+     password to the PASSKEY you'll share with the organizers. Pick a decent one
+     (12+ chars) since anyone with it gets full control.
+  3. Copy that user's User UID (goes into firestore.rules).
+
+Share the passkey privately with the organizers (not in a public channel). To
+revoke after the event, change that account's password in the console.
 
 --------------------------------------------------------------------------------
 ## 3. Deploy security rules (do NOT skip)
