@@ -39,6 +39,8 @@ export default function AdminPage() {
   const [editingId, setEditingId] = useState(null);
   const [editName, setEditName] = useState('');
 
+  const [enlargedImg, setEnlargedImg] = useState(null);
+
   const [newName, setNewName] = useState('');
   const [newPhoto, setNewPhoto] = useState(null);
   const [uploadLoading, setUploadLoading] = useState(false);
@@ -185,7 +187,7 @@ export default function AdminPage() {
         <div className="absolute bottom-[-10%] left-[-10%] w-96 h-96 bg-yellow-100 rounded-full mix-blend-multiply filter blur-3xl opacity-40"></div>
 
         <div className="max-w-sm w-full relative z-10 animate-in fade-in zoom-in-95 duration-500">
-          <Link href="/" className="inline-flex items-center text-slate-400 hover:text-slate-600 mb-6 transition-colors font-medium text-sm">
+          <Link href="/" className="inline-flex items-center text-slate-500 hover:text-slate-600 mb-6 transition-colors font-medium text-sm">
             <ArrowLeft className="w-4 h-4 mr-2" /> Back Home
           </Link>
 
@@ -194,13 +196,13 @@ export default function AdminPage() {
               <Lock className="w-8 h-8 text-green-600" />
             </div>
             <h1 className="text-2xl font-bold text-slate-700 mb-2">Enter Passkey</h1>
-            <p className="text-slate-400 mb-8 text-sm">Organizer access only.</p>
+            <p className="text-slate-500 mb-8 text-sm">Organizer access only.</p>
 
             <form onSubmit={handleSignIn} className="space-y-4">
               <div className="relative">
-                <KeyRound className="absolute left-4 top-3.5 w-5 h-5 text-slate-300" />
+                <KeyRound className="absolute left-4 top-3.5 w-5 h-5 text-slate-400" />
                 <input type="password" value={password} onChange={(e) => setPassword(e.target.value)}
-                  className={`w-full pl-12 pr-4 py-3 bg-white border rounded-xl outline-none transition-all placeholder:text-slate-300 text-slate-700 font-medium ${authError ? 'border-red-300 ring-2 ring-red-100' : 'border-slate-200 focus:border-green-400 focus:ring-2 focus:ring-green-100'}`}
+                  className={`w-full pl-12 pr-4 py-3 bg-white border rounded-xl outline-none transition-all placeholder:text-slate-400 text-slate-700 font-medium ${authError ? 'border-red-300 ring-2 ring-red-100' : 'border-slate-200 focus:border-green-400 focus:ring-2 focus:ring-green-100'}`}
                   placeholder="Passkey" autoComplete="current-password" autoFocus />
               </div>
 
@@ -236,7 +238,7 @@ export default function AdminPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
           <div>
             <Link href="/">
-              <button className="inline-flex items-center text-slate-400 hover:text-slate-600 mb-2 transition-colors font-medium text-sm">
+              <button className="inline-flex items-center text-slate-500 hover:text-slate-600 mb-2 transition-colors font-medium text-sm">
                 <ArrowLeft className="w-4 h-4 mr-2" /> Home
               </button>
             </Link>
@@ -259,19 +261,23 @@ export default function AdminPage() {
               {votingOpen ? 'Voting open' : 'Voting closed'}
             </button>
 
-            <div className="bg-white p-1 rounded-xl border border-slate-200 shadow-sm flex">
-              <button onClick={() => setActiveTab('results')}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 ease-out flex items-center gap-2 ${activeTab === 'results' ? 'bg-green-50 text-green-700 shadow-sm' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'}`}>
+            <div className="flex">
+              <button
+                onClick={() => setActiveTab('results')}
+                className={`seg-btn seg-left ${activeTab === 'results' ? 'seg-active' : ''}`}
+              >
                 <Trophy className="w-4 h-4" /> Manage Entries
               </button>
-              <button onClick={() => setActiveTab('upload')}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 ease-out flex items-center gap-2 ${activeTab === 'upload' ? 'bg-green-50 text-green-700 shadow-sm' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'}`}>
+              <button
+                onClick={() => setActiveTab('upload')}
+                className={`seg-btn seg-right ${activeTab === 'upload' ? 'seg-active' : ''}`}
+              >
                 <Plus className="w-4 h-4" /> Upload New
               </button>
             </div>
 
             <button onClick={handleSignOut}
-              className="p-2.5 bg-white border border-slate-200 rounded-xl text-slate-400 hover:text-red-500 hover:border-red-200 transition-all shadow-sm" title="Sign out">
+              className="p-2.5 bg-white border border-slate-200 rounded-xl text-slate-500 hover:text-red-500 hover:border-red-200 transition-all shadow-sm" title="Sign out">
               <LogOut className="w-4 h-4" />
             </button>
           </div>
@@ -284,10 +290,10 @@ export default function AdminPage() {
                 <table className="w-full text-left">
                   <thead className="bg-slate-50 border-b border-slate-100">
                     <tr>
-                      <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Rank</th>
-                      <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Contestant</th>
-                      <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">Votes</th>
-                      <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">Actions</th>
+                      <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Rank</th>
+                      <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Contestant</th>
+                      <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Votes</th>
+                      <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -296,22 +302,27 @@ export default function AdminPage() {
                         <td className="px-6 py-4 w-20">
                           <div className="flex items-center gap-3">
                             {index === 0 && <Medal className="w-5 h-5 text-yellow-400" />}
-                            {index === 1 && <Medal className="w-5 h-5 text-slate-300" />}
+                            {index === 1 && <Medal className="w-5 h-5 text-slate-400" />}
                             {index === 2 && <Medal className="w-5 h-5 text-amber-600" />}
-                            <span className={`font-mono text-sm ${index < 3 ? 'font-bold text-slate-700' : 'text-slate-400'}`}>#{index + 1}</span>
+                            <span className={`font-mono text-sm ${index < 3 ? 'font-bold text-slate-700' : 'text-slate-500'}`}>#{index + 1}</span>
                           </div>
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-4">
-                            <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-slate-100 ring-1 ring-slate-100 flex-shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => setEnlargedImg({ url: contestant.photoURL, name: contestant.name })}
+                              className="relative w-12 h-12 rounded-lg overflow-hidden bg-slate-100 ring-1 ring-slate-200 flex-shrink-0 cursor-zoom-in hover:ring-2 hover:ring-green-300 transition-all"
+                              title="View larger"
+                            >
                               <Image src={cldThumb(contestant.photoURL, 100)} alt={contestant.name} fill className="object-cover" unoptimized />
-                            </div>
+                            </button>
                             {editingId === contestant.id ? (
                               <div className="flex items-center gap-2">
                                 <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)}
-                                  className="px-2 py-1 border border-green-400 rounded focus:outline-none focus:ring-2 focus:ring-green-100 text-sm w-32 md:w-48" autoFocus />
+                                  className="px-2 py-1 border border-green-400 rounded focus:outline-none focus:ring-2 focus:ring-green-100 text-sm text-slate-900 w-32 md:w-48" autoFocus />
                                 <button onClick={() => saveEdit(contestant.id)} className="p-1 text-green-500 hover:bg-green-50 rounded"><Save className="w-4 h-4" /></button>
-                                <button onClick={cancelEdit} className="p-1 text-slate-400 hover:bg-slate-100 rounded"><X className="w-4 h-4" /></button>
+                                <button onClick={cancelEdit} className="p-1 text-slate-500 hover:bg-slate-100 rounded"><X className="w-4 h-4" /></button>
                               </div>
                             ) : (
                               <span className="font-medium text-slate-700">{contestant.name}</span>
@@ -323,10 +334,10 @@ export default function AdminPage() {
                         </td>
                         <td className="px-6 py-4 text-right">
                           <div className="flex items-center justify-end gap-1">
-                            <button onClick={() => startEdit(contestant)} className="p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded-full transition-all" title="Edit Name">
+                            <button onClick={() => startEdit(contestant)} className="p-2 text-slate-500 hover:text-green-600 hover:bg-green-50 rounded-full transition-all" title="Edit Name">
                               <Edit2 className="w-4 h-4" />
                             </button>
-                            <button onClick={() => handleDelete(contestant.id, contestant.name)} className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-50 rounded-full transition-all" title="Delete">
+                            <button onClick={() => handleDelete(contestant.id, contestant.name)} className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-50 rounded-full transition-all" title="Delete">
                               <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
@@ -338,7 +349,7 @@ export default function AdminPage() {
                 {contestants.length === 0 && (
                   <div className="text-center py-16">
                     <Trophy className="w-12 h-12 text-slate-200 mx-auto mb-3" />
-                    <p className="text-slate-400">No entries yet. Add costumes from the Upload tab.</p>
+                    <p className="text-slate-500">No entries yet. Add costumes from the Upload tab.</p>
                   </div>
                 )}
               </div>
@@ -349,18 +360,19 @@ export default function AdminPage() {
             <div className="max-w-xl mx-auto">
               <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
                 <h2 className="text-xl font-bold text-slate-700 mb-6 flex items-center gap-2">
-                  <UploadCloud className="w-5 h-5 text-green-600" /> Add New Contestant
+                  <UploadCloud className="w-5 h-5 text-green-600" /> Add New Participant
                 </h2>
 
                 <form onSubmit={handleUpload} className="space-y-6">
                   <div>
-                    <label className="block text-sm font-semibold text-slate-500 mb-2">Name</label>
+                    <label className="block text-sm font-semibold text-slate-600 mb-2">Name</label>
                     <input type="text" value={newName} onChange={(e) => setNewName(e.target.value)}
-                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-green-100 focus:border-green-400 outline-none transition-all" disabled={uploadLoading} />
+                      placeholder="Participant name"
+                      className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-500 focus:ring-2 focus:ring-green-100 focus:border-green-400 outline-none transition-all" disabled={uploadLoading} />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-slate-500 mb-2">Photo</label>
+                    <label className="block text-sm font-semibold text-slate-600 mb-2">Photo</label>
                     <div className="relative group">
                       <input type="file" accept="image/*" onChange={(e) => setNewPhoto(e.target.files[0])}
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" disabled={uploadLoading} />
@@ -371,7 +383,7 @@ export default function AdminPage() {
                             <span className="text-sm font-medium truncate max-w-[200px]">{newPhoto.name}</span>
                           </div>
                         ) : (
-                          <div className="flex flex-col items-center text-slate-400">
+                          <div className="flex flex-col items-center text-slate-500">
                             <UploadCloud className="w-8 h-8 mb-2" />
                             <span className="text-sm">Click to select photo</span>
                           </div>
@@ -397,6 +409,28 @@ export default function AdminPage() {
           )}
         </div>
       </div>
+
+      {enlargedImg && (
+        <div
+          onClick={() => setEnlargedImg(null)}
+          className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 cursor-zoom-out fade-up"
+        >
+          <button
+            onClick={() => setEnlargedImg(null)}
+            className="absolute top-6 right-6 p-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
+            aria-label="Close"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          <img
+            src={cldThumb(enlargedImg.url, 1000)}
+            alt={enlargedImg.name}
+            onClick={(e) => e.stopPropagation()}
+            className="max-w-full max-h-[80vh] rounded-2xl object-contain shadow-2xl"
+          />
+          <p className="mt-4 text-white font-medium">{enlargedImg.name}</p>
+        </div>
+      )}
     </div>
   );
 }

@@ -110,35 +110,35 @@ export default function VotePage() {
 
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
           <div>
-            <Link href="/" className="inline-flex items-center text-slate-400 hover:text-slate-600 mb-4 transition-colors font-medium text-sm">
+            <Link href="/" className="inline-flex items-center text-slate-500 hover:text-slate-600 mb-4 transition-colors font-medium text-sm">
               <ArrowLeft className="w-4 h-4 mr-2" /> Home
             </Link>
             <h1 className="text-3xl md:text-4xl font-bold text-green-700 tracking-tight">Costume Gallery</h1>
-            <p className="text-slate-400 mt-1">
+            <p className="text-slate-500 mt-1">
               {votingOpen ? 'Pick your favorite — one vote each.' : 'Voting has closed.'}
             </p>
           </div>
 
-          <div className="mt-4 md:mt-0 px-4 py-2 bg-white rounded-full border border-slate-200 text-slate-500 text-sm font-medium flex items-center gap-2 shadow-sm">
+          <div className="mt-4 md:mt-0 px-4 py-2 bg-white rounded-full border border-slate-200 text-slate-600 text-sm font-medium flex items-center gap-2 shadow-sm">
             <Heart className="w-4 h-4 text-green-600 fill-green-600" />
             <span>{totalVotes} total votes</span>
           </div>
         </div>
 
         {!votingOpen && (
-          <div className="mb-8 flex items-center gap-3 bg-slate-100 border border-slate-200 text-slate-600 rounded-2xl px-5 py-4">
-            <Lock className="w-5 h-5 flex-shrink-0" />
-            <span className="font-medium">Voting is closed. Thanks for taking part — head to the results screen for the winners!</span>
+          <div className="mb-8 inline-flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 rounded-full px-4 py-2 font-semibold">
+            <Lock className="w-4 h-4 flex-shrink-0" />
+            Voting has closed.
           </div>
         )}
 
         {ordered.length === 0 ? (
           <div className="text-center py-20 bg-white/50 rounded-3xl border border-dashed border-slate-200">
             <div className="inline-block p-4 bg-slate-50 rounded-full mb-4">
-              <Shirt className="w-8 h-8 text-slate-300" />
+              <Shirt className="w-8 h-8 text-slate-400" />
             </div>
             <p className="text-xl font-medium text-slate-600">No costumes yet</p>
-            <p className="text-slate-400 text-sm mt-1">Check back once entries are added!</p>
+            <p className="text-slate-500 text-sm mt-1">Check back once entries are added!</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -181,8 +181,8 @@ export default function VotePage() {
                         isMine
                           ? 'bg-green-50 text-green-600 cursor-default'
                           : lockedOut
-                          ? 'bg-slate-50 text-slate-300 cursor-not-allowed'
-                          : 'bg-slate-50 text-slate-500 hover:bg-green-600 hover:text-white shadow-sm hover:shadow-md'
+                          ? 'bg-slate-50 text-slate-400 cursor-not-allowed'
+                          : 'bg-slate-50 text-slate-600 hover:bg-green-600 hover:text-white shadow-sm hover:shadow-md'
                       }`}
                     >
                       <Heart className={`w-4 h-4 ${isMine ? 'fill-green-600' : ''}`} />
