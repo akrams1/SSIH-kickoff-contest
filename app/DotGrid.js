@@ -30,6 +30,14 @@ const GROW = 0.55;       // gentle size lift near the cursor
 const MAX_DOTS = 2600;
 const REST = 0.015;      // speed below which we call it settled
 
+// Halo: the grid only exists in an ellipse around the centre card and fades to
+// nothing before the screen edges. Sized in px (capped) rather than as a raw %
+// so the halo stays card-shaped instead of ballooning on a wide monitor.
+const HALO_W = 0.38, HALO_W_MAX = 560;
+const HALO_H = 0.55, HALO_H_MAX = 520;
+const FADE_IN = 0.40;    // solid inside this fraction of the ellipse
+const CULL = 0.02;       // below this visibility a dot is dropped entirely
+
 export default function DotGrid({ className = '' }) {
   const ref = useRef(null);
 
@@ -106,7 +114,7 @@ export default function DotGrid({ className = '' }) {
         const cb = (164 + (90 - 164) * near) | 0;
         ctx.beginPath();
         ctx.arc(d.x, d.y, r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${cr},${cg},${cb},${0.7 + 0.25 * near})`;
+        ctx.fillStyle = `rgba(${cr},${cg},${cb},${(0.7 + 0.25 * near) * d.vis})`;
         ctx.fill();
       }
 
@@ -136,12 +144,33 @@ export default function DotGrid({ className = '' }) {
       const offX = (w - (cols - 1) * SPACING) / 2;
       const offY = (h - (rows - 1) * SPACING) / 2;
 
+      const cx = w / 2;
+      const cy = h / 2;
+      const rx = Math.min(w * HALO_W, HALO_W_MAX);
+      const ry = Math.min(h * HALO_H, HALO_H_MAX);
+
       dots = [];
       outer: for (let i = 0; i < cols; i++) {
         for (let j = 0; j < rows; j++) {
           const x = offX + i * SPACING;
           const y = offY + j * SPACING;
-          dots.push({ ox: x, oy: y, x, y, vx: 0, vy: 0 });
+
+          // Elliptical falloff from the centre: 0 at the rim, 1 in the middle.
+          const nx = (x - cx) / rx;
+          const ny = (y - cy) / ry;
+          const nd = Math.sqrt(nx * nx + ny * ny);
+          let vis;
+          if (nd <= FADE_IN) vis = 1;
+          else if (nd >= 1) vis = 0;
+          else {
+            const t = 1 - (nd - FADE_IN) / (1 - FADE_IN);
+            vis = t * t * (3 - 2 * t); // smoothstep, no hard edge
+          }
+
+          // Dots out at the edges are never drawn, so don't simulate them either.
+          if (vis < CULL) continue;
+
+          dots.push({ ox: x, oy: y, x, y, vx: 0, vy: 0, vis });
           if (dots.length >= MAX_DOTS) break outer;
         }
       }
