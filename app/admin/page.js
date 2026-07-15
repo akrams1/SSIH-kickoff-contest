@@ -14,8 +14,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import {
   ArrowLeft, Trash2, Trophy, Loader2, Medal, UploadCloud, Plus, Edit2, Save, X,
-  CheckCircle, AlertCircle, Lock, KeyRound, LogOut, DoorOpen, DoorClosed
+  CheckCircle, AlertCircle, Lock, KeyRound, LogOut, DoorOpen, DoorClosed, Users, FileText
 } from 'lucide-react';
+import AttendanceTab from './AttendanceTab';
+import ReportTab from './ReportTab';
 
 // Passkey login, backed by ONE hidden Firebase account so the rules stay
 // enforceable. The admin only ever types the passkey; this fixed email is the
@@ -261,26 +263,39 @@ export default function AdminPage() {
               {votingOpen ? 'Voting open' : 'Voting closed'}
             </button>
 
-            <div className="flex">
-              <button
-                onClick={() => setActiveTab('results')}
-                className={`seg-btn seg-left ${activeTab === 'results' ? 'seg-active' : ''}`}
-              >
-                <Trophy className="w-4 h-4" /> Manage Entries
-              </button>
-              <button
-                onClick={() => setActiveTab('upload')}
-                className={`seg-btn seg-right ${activeTab === 'upload' ? 'seg-active' : ''}`}
-              >
-                <Plus className="w-4 h-4" /> Upload New
-              </button>
-            </div>
-
             <button onClick={handleSignOut}
               className="p-2.5 bg-white border border-slate-200 rounded-xl text-slate-500 hover:text-red-500 hover:border-red-200 transition-all shadow-sm" title="Sign out">
               <LogOut className="w-4 h-4" />
             </button>
           </div>
+        </div>
+
+        {/* Tabs — own row so four fit on any screen */}
+        <div className="flex flex-wrap gap-y-2 mb-6">
+          <button
+            onClick={() => setActiveTab('results')}
+            className={`seg-btn seg-left ${activeTab === 'results' ? 'seg-active' : ''}`}
+          >
+            <Trophy className="w-4 h-4" /> Entries
+          </button>
+          <button
+            onClick={() => setActiveTab('upload')}
+            className={`seg-btn seg-mid ${activeTab === 'upload' ? 'seg-active' : ''}`}
+          >
+            <Plus className="w-4 h-4" /> Upload
+          </button>
+          <button
+            onClick={() => setActiveTab('attendance')}
+            className={`seg-btn seg-mid ${activeTab === 'attendance' ? 'seg-active' : ''}`}
+          >
+            <Users className="w-4 h-4" /> Attendance
+          </button>
+          <button
+            onClick={() => setActiveTab('report')}
+            className={`seg-btn seg-right ${activeTab === 'report' ? 'seg-active' : ''}`}
+          >
+            <FileText className="w-4 h-4" /> Report
+          </button>
         </div>
 
         <div key={activeTab} className="animate-in fade-in slide-in-from-bottom-4 duration-500 ease-in-out fill-mode-forwards">
@@ -355,6 +370,10 @@ export default function AdminPage() {
               </div>
             </div>
           )}
+
+          {activeTab === 'attendance' && <AttendanceTab />}
+
+          {activeTab === 'report' && <ReportTab />}
 
           {activeTab === 'upload' && (
             <div className="max-w-xl mx-auto">

@@ -1,36 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-
-// Verified with zxing-cpp (the decoder family phones use). At these values the
-// code still decodes at 100px, 45deg rotation, blur r=3, low contrast, camera
-// noise and perspective tilt.
-//   - errorCorrectionLevel 'H' (30% recovery) — mandatory, the logo destroys data
-//   - hideBackgroundDots — the logo art has transparent gaps; without this,
-//     QR dots show through the ball's panels and muddy it.
-//   - imageSize 0.55 is the practical ceiling: the library quantises the logo to
-//     whole modules and clamps it to the error-correction budget, so 0.6 renders
-//     identically to 0.55. Raising it further does nothing.
-// Re-test a real scan if you change the logo art or these numbers.
-const qrOptions = (data, size) => ({
-  width: size,
-  height: size,
-  type: 'canvas',
-  data,
-  image: '/logo-mark.png',
-  margin: 8,
-  qrOptions: { errorCorrectionLevel: 'H' },
-  dotsOptions: { type: 'rounded', color: '#1b372a' },
-  cornersSquareOptions: { type: 'extra-rounded', color: '#1b372a' },
-  cornersDotOptions: { type: 'dot', color: '#1b372a' },
-  backgroundOptions: { color: '#ffffff' },
-  imageOptions: {
-    hideBackgroundDots: true,
-    imageSize: 0.55,
-    margin: 4,
-    crossOrigin: 'anonymous',
-  },
-});
+import { qrOptions } from '@/lib/qr';
 
 export default function StyledQR({ data, size = 400, className = '' }) {
   const holder = useRef(null);

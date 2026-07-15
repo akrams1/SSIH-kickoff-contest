@@ -56,6 +56,17 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Attendance register — who came to the event. Admin only, both ways:
+    // this is personal data and must never be publicly readable.
+    match /attendees/{id} {
+      allow read, write: if isAdmin();
+    }
+
+    // Saved report draft. Admin only.
+    match /report/{doc} {
+      allow read, write: if isAdmin();
+    }
+
     // Everything else denied.
     match /{document=**} {
       allow read, write: if false;
