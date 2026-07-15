@@ -216,7 +216,7 @@ export default function AdminPage() {
               )}
 
               <button type="submit" disabled={signingIn}
-                className="w-full bg-green-600 hover:bg-green-700 disabled:bg-slate-300 text-white py-3 rounded-xl font-semibold shadow-lg shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2">
+                className="w-full bg-green-600 hover:bg-green-700 disabled:bg-slate-300 text-white py-3 rounded-xl font-semibold transition-all active:scale-95 flex items-center justify-center gap-2">
                 {signingIn ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Unlock Dashboard'}
               </button>
             </form>
@@ -235,7 +235,7 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6 md:p-12">
+    <div className="min-h-screen bg-slate-50 p-4 md:p-12">
       <div className="max-w-5xl mx-auto">
 
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
@@ -411,7 +411,7 @@ export default function AdminPage() {
                   </div>
 
                   <button type="submit" disabled={uploadLoading}
-                    className="w-full bg-green-600 hover:bg-green-700 disabled:bg-slate-200 text-white py-3 rounded-xl font-semibold shadow-lg shadow-green-100 disabled:shadow-none flex items-center justify-center gap-2 transition-all">
+                    className="w-full bg-green-600 hover:bg-green-700 disabled:bg-slate-200 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all">
                     {uploadLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Upload Entry'}
                   </button>
                 </form>

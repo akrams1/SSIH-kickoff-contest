@@ -45,7 +45,7 @@ export default function Home() {
       <DotGrid className="absolute inset-0 w-full h-full z-0 pointer-events-none" />
 
       <div className="max-w-md w-full relative z-10">
-        <div className="fade-up bg-white/70 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white/50 p-10 text-center flex flex-col items-center">
+        <div className="fade-up bg-white/70 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white/50 p-6 sm:p-10 text-center flex flex-col items-center">
 
           {/* Event title lockup */}
           <img
@@ -56,12 +56,12 @@ export default function Home() {
             className="w-full max-w-sm mx-auto mb-6 select-none"
           />
 
-          <p className="text-xl text-slate-400 font-medium mb-12">
+          <p className="text-lg sm:text-xl text-slate-500 font-medium mb-8">
             Costume Contest &middot; vote for the best fit
           </p>
 
           {/* Vote CTA — layered pushable button */}
-          <div className="w-full mb-12 flex justify-center">
+          <div className="w-full mb-10 flex justify-center">
             <button onClick={handleStart} className="vote-push select-none">
               <span className="vote-push__shadow" />
               <span className="vote-push__edge" />
@@ -88,15 +88,15 @@ export default function Home() {
             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-white/20 rounded-3xl">
                 <Maximize2 className="w-8 h-8 text-slate-500" />
             </div>
-            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-white px-3 py-1 rounded-full shadow-sm border border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-white px-3 py-1 rounded-full shadow-sm border border-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
               Project Fullscreen
             </div>
           </div>
 
           {/* 🔒 Admin Link */}
-          <div className="w-full pt-4">
+          <div className="w-full pt-2">
             <Link href="/admin">
-              <button className="text-slate-300 text-xs font-bold flex items-center justify-center gap-2 mx-auto px-4 py-2 rounded-full hover:bg-slate-50 transition-colors uppercase tracking-wider">
+              <button className="text-slate-500 hover:text-slate-600 text-xs font-bold flex items-center justify-center gap-2 mx-auto px-4 py-2 rounded-full hover:bg-slate-50 transition-colors uppercase tracking-wider">
                 <Lock className="w-3 h-3" />
                 Admin Access
               </button>

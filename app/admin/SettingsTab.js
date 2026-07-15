@@ -71,7 +71,7 @@ export default function SettingsTab() {
   };
 
   return (
-    <div className="max-w-lg mx-auto space-y-5">
+    <div className="max-w-3xl mx-auto space-y-5">
       <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
         <div className="flex items-start gap-3 mb-4">
           <div className="p-2 bg-red-50 rounded-lg flex-shrink-0">

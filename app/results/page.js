@@ -44,7 +44,7 @@ function PodiumPlayer({ player, rank, size }) {
       </div>
       <p className={`mt-4 font-semibold text-slate-800 ${size === 'lg' ? 'text-lg' : 'text-sm'} max-w-[8rem] truncate`}>{player.name}</p>
       <p className={`${bebas.className} ${size === 'lg' ? 'text-3xl' : 'text-2xl'} text-slate-900 leading-none mt-1`}>{player.votes}</p>
-      <p className="text-[10px] uppercase tracking-widest text-slate-400 mt-0.5">votes</p>
+      <p className="text-[10px] uppercase tracking-widest text-slate-500 mt-0.5">votes</p>
     </div>
   );
 }
@@ -101,7 +101,7 @@ export default function ResultsPage() {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center text-center px-6 relative overflow-hidden">
         <PitchLines />
-        <p className="relative text-xs uppercase tracking-[0.25em] text-slate-400 mb-3">SSIH Kick Off &rsquo;26</p>
+        <p className="relative text-xs uppercase tracking-[0.25em] text-slate-500 mb-3">SSIH Kick Off &rsquo;26</p>
         <h1 className={`${bebas.className} relative text-6xl text-slate-900`}>No entries yet</h1>
         <p className="relative text-slate-500 mt-2">Add costumes in the admin panel to kick things off.</p>
       </div>
@@ -118,7 +118,7 @@ export default function ResultsPage() {
     <div className="min-h-screen bg-slate-50 relative overflow-hidden">
       <PitchLines />
 
-      <div className="relative max-w-3xl mx-auto px-6 py-16">
+      <div className="relative max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
 
         {/* Header — scoreboard masthead */}
         <div className="fade-up text-center mb-14">
@@ -171,7 +171,7 @@ export default function ResultsPage() {
               </AnimatePresence>
             </div>
             {topTie && revealedAll && (
-              <p className="text-center text-xs text-slate-400 mt-3">Level on votes at the top — separated by earliest entry.</p>
+              <p className="text-center text-xs text-slate-500 mt-3">Level on votes at the top — separated by earliest entry.</p>
             )}
           </div>
         )}
@@ -191,11 +191,11 @@ export default function ResultsPage() {
         {/* League table — 4th onward */}
         {revealedAll && others.length > 0 && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-12">
-            <p className="text-xs uppercase tracking-widest text-slate-400 mb-3 px-1">Also played</p>
+            <p className="text-xs uppercase tracking-widest text-slate-500 mb-3 px-1">Also played</p>
             <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden">
               {others.map((p, i) => (
                 <div key={p.id} className="flex items-center gap-4 px-4 py-3 border-b border-slate-100 last:border-0">
-                  <span className={`${bebas.className} text-lg text-slate-400 w-6 text-center`}>{i + 4}</span>
+                  <span className={`${bebas.className} text-lg text-slate-500 w-6 text-center`}>{i + 4}</span>
                   <div className="w-9 h-9 rounded-full overflow-hidden bg-slate-100 ring-1 ring-slate-200">
                     <img src={cldThumb(p.photoURL, 100)} alt={p.name} className="w-full h-full object-cover" />
                   </div>
