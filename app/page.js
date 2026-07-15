@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, X, Maximize2 } from 'lucide-react';
 import { Dancing_Script } from 'next/font/google';
+import StyledQR from './StyledQR';
 
 const dancingScript = Dancing_Script({
   subsets: ['latin'],
@@ -13,16 +14,14 @@ const dancingScript = Dancing_Script({
 });
 
 export default function Home() {
-  const [qrCodeURL, setQrCodeURL] = useState('');
+  const [siteURL, setSiteURL] = useState('');
   const [mounted, setMounted] = useState(false);
   const [showBigQR, setShowBigQR] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
-    const landingURL = window.location.origin;
-    const qrAPI = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&color=356f50&bgcolor=ffffff&data=${encodeURIComponent(landingURL)}`;
-    setQrCodeURL(qrAPI);
+    setSiteURL(window.location.origin);
   }, []);
 
   const handleStart = (e) => {
@@ -70,8 +69,12 @@ export default function Home() {
             className="mb-8 p-1 bg-white rounded-3xl border border-slate-100 shadow-sm relative group cursor-pointer hover:scale-105 transition-transform"
           >
             <div className="bg-slate-50 p-4 rounded-[1.3rem] overflow-hidden">
-                {qrCodeURL ? (
-                  <img src={qrCodeURL} alt="Join Contest QR" className="w-40 h-40 mx-auto rounded-lg opacity-90" />
+                {siteURL ? (
+                  <StyledQR
+                    data={siteURL}
+                    size={400}
+                    className="w-40 h-40 mx-auto [&>canvas]:w-full [&>canvas]:h-full [&>canvas]:rounded-lg"
+                  />
                 ) : (
                   <div className="w-40 h-40 bg-slate-100 animate-pulse rounded-xl mx-auto" />
                 )}
@@ -116,7 +119,11 @@ export default function Home() {
               className="bg-white p-6 rounded-3xl shadow-2xl max-w-2xl w-full aspect-square flex items-center justify-center"
               onClick={(e) => e.stopPropagation()}
             >
-                <img src={qrCodeURL.replace('300x300', '1000x1000')} alt="Big QR Code" className="w-full h-full object-contain rendering-pixelated" />
+                <StyledQR
+                  data={siteURL}
+                  size={1000}
+                  className="w-full h-full flex items-center justify-center [&>canvas]:w-full [&>canvas]:h-full [&>canvas]:object-contain"
+                />
             </motion.div>
             <div className="mt-8 text-center">
                 <h2 className={`${dancingScript.className} text-6xl text-yellow-400 mb-2`}>Scan to Vote</h2>
