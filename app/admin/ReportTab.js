@@ -10,6 +10,7 @@ import { urlToDataUrl } from '@/lib/upload';
 import { cldThumb } from '@/lib/img';
 import {
   FileText, Loader2, Save, ImagePlus, X, Plus, Trash2, CheckCircle, AlertCircle, Camera, Check,
+  RotateCcw,
 } from 'lucide-react';
 
 const BLANK = {
@@ -26,6 +27,10 @@ const BLANK = {
   votingSystem: '',
   challenges: [{ issue: '', resolution: '' }],
 };
+
+// BLANK holds a nested array, so every consumer gets its own deep copy rather
+// than a shared reference to the module-level object.
+const blankForm = () => structuredClone(BLANK);
 
 // Downscale a photo before embedding. A handful of untouched phone photos would
 // produce a 50MB PDF; this keeps the whole report to a few MB.
@@ -56,7 +61,7 @@ function fileToScaledDataUrl(file, maxDim = 1200, quality = 0.75) {
 }
 
 export default function ReportTab() {
-  const [form, setForm] = useState(BLANK);
+  const [form, setForm] = useState(blankForm());
   const [contestants, setContestants] = useState([]);
   const [attendees, setAttendees] = useState([]);
   const [photos, setPhotos] = useState([]); // from this PC: { id, dataUrl, name }
@@ -65,6 +70,7 @@ export default function ReportTab() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [clearing, setClearing] = useState(false);
   const [msg, setMsg] = useState(null);
   const msgTimer = useRef(null);
 
@@ -97,7 +103,7 @@ export default function ReportTab() {
 
     getDoc(doc(db, 'report', 'draft'))
       .then((s) => {
-        if (s.exists()) setForm({ ...BLANK, ...s.data() });
+        if (s.exists()) setForm({ ...blankForm(), ...s.data() });
       })
       .catch((e) => console.error('draft load', e))
       .finally(() => setLoading(false));
@@ -134,6 +140,28 @@ export default function ReportTab() {
       say('err', 'Could not save draft');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const clearAll = async () => {
+    if (!confirm(
+      'Clear every field and delete the saved draft?\n\n' +
+      'Photos uploaded by attendees are NOT deleted. This cannot be undone.'
+    )) return;
+    setClearing(true);
+    try {
+      // Delete first. Blanking local state while report/draft still exists would
+      // just restore everything on the next mount (see the getDoc above).
+      await deleteDoc(doc(db, 'report', 'draft'));
+      setForm(blankForm());
+      setPicked([]);
+      setPhotos([]);
+      say('ok', 'Form cleared');
+    } catch (e) {
+      console.error('Clear failed:', e);
+      say('err', 'Could not clear the saved draft');
+    } finally {
+      setClearing(false);
     }
   };
 
@@ -442,7 +470,7 @@ export default function ReportTab() {
       <div className="flex flex-col sm:flex-row gap-3">
         <button
           onClick={saveDraft}
-          disabled={saving}
+          disabled={saving || clearing}
           className="flex-1 px-5 py-3 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors shadow-sm"
         >
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
@@ -450,11 +478,20 @@ export default function ReportTab() {
         </button>
         <button
           onClick={generate}
-          disabled={generating}
+          disabled={generating || clearing}
           className="flex-1 px-5 py-3 bg-green-600 hover:bg-green-700 disabled:bg-slate-300 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors"
         >
           {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
           Generate PDF
+        </button>
+        <button
+          onClick={clearAll}
+          disabled={clearing || saving || generating}
+          title="Clear every field and delete the saved draft"
+          className="px-5 py-3 bg-white border border-slate-200 text-slate-600 hover:text-red-600 hover:border-red-200 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors shadow-sm"
+        >
+          {clearing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RotateCcw className="w-4 h-4" />}
+          Clear
         </button>
       </div>
 
