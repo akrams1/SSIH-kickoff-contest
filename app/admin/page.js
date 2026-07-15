@@ -14,9 +14,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import {
   ArrowLeft, Trash2, Trophy, Loader2, Medal, UploadCloud, Plus, Edit2, Save, X,
-  CheckCircle, AlertCircle, Lock, KeyRound, LogOut, DoorOpen, DoorClosed, Users, FileText
+  CheckCircle, AlertCircle, Lock, KeyRound, LogOut, DoorOpen, DoorClosed, Users, FileText, Settings
 } from 'lucide-react';
 import AttendanceTab from './AttendanceTab';
+import SettingsTab from './SettingsTab';
 import ReportTab from './ReportTab';
 
 // Passkey login, backed by ONE hidden Firebase account so the rules stay
@@ -277,6 +278,7 @@ export default function AdminPage() {
             ['upload', 'Upload', Plus],
             ['attendance', 'Attendance', Users],
             ['report', 'Report', FileText],
+            ['settings', 'Settings', Settings],
           ].map(([id, text, Icon]) => (
             <label className="radio" key={id}>
               <input
@@ -293,7 +295,7 @@ export default function AdminPage() {
           ))}
         </div>
 
-        <div key={activeTab} className="animate-in fade-in duration-300">
+        <div key={activeTab} className="tab-panel">
           {activeTab === 'results' && (
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
               <div className="overflow-x-auto">
@@ -369,6 +371,8 @@ export default function AdminPage() {
           {activeTab === 'attendance' && <AttendanceTab />}
 
           {activeTab === 'report' && <ReportTab />}
+
+          {activeTab === 'settings' && <SettingsTab />}
 
           {activeTab === 'upload' && (
             <div className="max-w-xl mx-auto">

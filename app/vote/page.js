@@ -13,7 +13,10 @@ import { Heart, ArrowLeft, Loader2, Shirt, Check } from 'lucide-react';
 
 // Bump this key if you redeploy on a domain that ran a previous event,
 // so returning voters aren't blocked by an old record.
-const VOTED_KEY = 'votedFor_kickoff26';
+// The vote lock is per ROUND. Resetting votes bumps config/event.round, which
+// changes this key, which is what actually lets people vote again — clearing the
+// counters alone would leave every phone still holding its old lock.
+const votedKey = (round) => `votedFor_kickoff26_r${round}`;
 
 // SINGLE-CHOICE voting: one vote per person, final.
 // To switch to APPROVAL (vote for many), see the note on handleVote below.
@@ -58,6 +61,7 @@ export default function VotePage() {
   const [contestants, setContestants] = useState([]);
   const [votedFor, setVotedFor] = useState(null); // single id, or null
   const [votingOpen, setVotingOpen] = useState(true);
+  const [round, setRound] = useState(null); // null until config loads
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
   const seed = useRef(Math.floor(Math.random() * 2 ** 31));
@@ -80,9 +84,6 @@ export default function VotePage() {
   }, [contestants.map((c) => c.id).join(',')]);
 
   useEffect(() => {
-    const saved = localStorage.getItem(VOTED_KEY);
-    if (saved) setVotedFor(saved);
-
     const q = query(collection(db, 'contestants'), orderBy('createdAt', 'desc'));
     const unsub = onSnapshot(q, (snap) => {
       setContestants(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
@@ -91,7 +92,9 @@ export default function VotePage() {
 
     // Live voting-open flag. Fail-open: missing doc or open !== false => open.
     const unsubCfg = onSnapshot(doc(db, 'config', 'event'), (snap) => {
-      setVotingOpen(!snap.exists() || snap.data().open !== false);
+      const data = snap.exists() ? snap.data() : {};
+      setVotingOpen(!snap.exists() || data.open !== false);
+      setRound(typeof data.round === 'number' ? data.round : 1);
     });
 
     return () => {
@@ -101,6 +104,13 @@ export default function VotePage() {
     };
   }, []);
 
+  // Load this round's lock. Re-runs when an admin resets and the round bumps,
+  // which releases everyone to vote again without clearing their site data.
+  useEffect(() => {
+    if (round === null) return;
+    setVotedFor(localStorage.getItem(votedKey(round)) || null);
+  }, [round]);
+
   const handleVote = async (contestantId) => {
     if (!votingOpen) return showToast('Voting has closed.');
     // SINGLE-CHOICE guard. For APPROVAL voting, change this line to:
@@ -109,14 +119,14 @@ export default function VotePage() {
 
     // Optimistic lock BEFORE the network call so a double-tap can't double-fire.
     setVotedFor(contestantId);
-    localStorage.setItem(VOTED_KEY, contestantId);
+    localStorage.setItem(votedKey(round), contestantId);
 
     try {
       await updateDoc(doc(db, 'contestants', contestantId), { votes: increment(1) });
     } catch (err) {
       console.error('Vote error:', err);
       setVotedFor(null);
-      localStorage.removeItem(VOTED_KEY);
+      localStorage.removeItem(votedKey(round));
       showToast('Vote failed — try again.');
     }
   };
