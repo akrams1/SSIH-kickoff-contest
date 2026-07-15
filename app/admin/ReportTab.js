@@ -150,19 +150,25 @@ export default function ReportTab() {
     setGenerating(true);
     try {
       // Only pull pdfmake in when someone actually builds a report.
-      const mod = await import('pdfmake/build/pdfmake');
-      const pdfMake = mod.default || mod;
+      const [pdfMod, timesMod] = await Promise.all([
+        import('pdfmake/build/pdfmake'),
+        import('pdfmake/build/standard-fonts/Times'),
+      ]);
+      const pdfMake = pdfMod.default || pdfMod;
+      const times = timesMod.default || timesMod;
 
-      // Times is a PDF standard-14 face: built into every reader, so no font
-      // file is embedded and we skip pdfmake's 850KB vfs_fonts bundle entirely.
-      pdfMake.addFonts({
-        Times: {
-          normal: 'Times-Roman',
-          bold: 'Times-Bold',
-          italics: 'Times-Italic',
-          bolditalics: 'Times-BoldItalic',
-        },
-      });
+      // Times is a PDF standard-14 face, so no font file is embedded in the
+      // output and we skip pdfmake's 850KB vfs_fonts bundle. It must be added
+      // as a *font container*, not addFonts(): in the browser there is no disk,
+      // so pdfkit needs the AFM metrics loaded into the virtual filesystem.
+      // addFonts alone registers the name but not the metrics, and rendering
+      // then fails at download time.
+      if (typeof pdfMake.addFontContainer === 'function') {
+        pdfMake.addFontContainer(times);
+      } else {
+        pdfMake.addVirtualFileSystem?.(times.vfs);
+        pdfMake.addFonts(times.fonts);
+      }
 
       // Render the real QR (football logo and all) offscreen. The admin page has
       // no QR on it, so there is no canvas to copy from.
@@ -183,8 +189,10 @@ export default function ReportTab() {
       });
 
       const safe = (form.reportTitle || 'event-report').replace(/[^a-z0-9]+/gi, '-').toLowerCase();
-      pdfMake.createPdf(docDef).download(`${safe}.pdf`);
-      say('ok', 'Report generated');
+      // download() is async in pdfmake 0.3 — without await, a failure becomes an
+      // unhandled rejection and we would claim success while nothing downloads.
+      await pdfMake.createPdf(docDef).download(`${safe}.pdf`);
+      say('ok', 'Report downloaded');
     } catch (e) {
       console.error('PDF error', e);
       say('err', 'Could not generate the PDF');
