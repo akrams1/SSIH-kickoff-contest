@@ -126,49 +126,139 @@ body {
   animation: fadeUp 0.5s cubic-bezier(0.2, 0.7, 0.3, 1) both;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .fade-up { animation: none; }
-  .vote-push__front,
-  .vote-push__shadow { transition: none; }
+/* Admin tabs — segmented radio control. Markup (admin/page.js:275) is
+   .radio-inputs > label.radio > (input[type=radio] + span.name), so the
+   checked state has to be driven off `input:checked + .name`. */
+.radio-inputs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  background-color: #f1f5f9;
+  border-radius: 0.75rem;
+  box-sizing: border-box;
 }
-
-/* Admin segmented toggle — subtle keycap press in the app's white/slate tones.
-   Fixed width: letter-spacing on press changes text metrics, and on an
-   auto-width button that reflows every sibling. Fixed width keeps it still. */
-.seg-btn {
-  font: inherit;
-  display: inline-flex;
+.radio-inputs .radio {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 6.5rem;
+  margin: 0;
+}
+/* Not display:none — that would drop the tabs out of the tab order. */
+.radio-inputs .radio input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.radio-inputs .radio .name {
+  display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  width: 10.25rem;
-  background-color: #ffffff;
-  border: 0;
-  color: #64748b;
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border-radius: 0.5rem;
+  color: #475569;
   font-size: 0.875rem;
   font-weight: 600;
-  padding: 0.55em 0;
-  box-shadow: inset 0 1px 0 0 #ffffff, 0 1px 0 0 #f1f5f9,
-    0 2px 0 0 #e9eef4, 0 3px 0 0 #e2e8f0, 0 4px 0 0 #dbe2ea,
-    0 4px 7px 0 rgba(100, 116, 139, 0.13);
-  transition: 0.2s ease;
+  white-space: nowrap;
   cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease,
+    box-shadow 0.15s ease;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
 }
-.seg-left  { border-radius: 0.5em 0 0 0.5em; margin-right: -1px; }
-.seg-right { border-radius: 0 0.5em 0.5em 0; }
-.seg-btn:hover { color: #475569; }
-.seg-btn:active,
-.seg-btn.seg-active {
-  translate: 0 3px;
-  letter-spacing: 0.02em;
-  color: #356f50;
-  background-color: #fbfdfc;
-  box-shadow: inset 0 1px 0 0 #ffffff, 0 1px 0 0 #f1f5f9,
-    0 1px 0 0 #e9eef4, 0 1px 0 0 #e2e8f0, 0 1px 0 0 #dbe2ea,
-    0 1px 3px 0 rgba(100, 116, 139, 0.12);
+.radio-inputs .radio:hover .name {
+  color: #1e293b;
 }
+.radio-inputs .radio input:checked + .name {
+  background-color: #ffffff;
+  color: #356f50;
+  box-shadow: 0 1px 2px 0 rgba(100, 116, 139, 0.16);
+}
+.radio-inputs .radio input:focus-visible + .name {
+  outline: 2px solid #37805c;
+  outline-offset: 2px;
+}
+
+/* Panel swap. admin/page.js:298 sets key={activeTab}, so React remounts this
+   node on every tab change and the animation replays. */
+.tab-panel {
+  animation: fadeUp 0.3s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+/* Voting-status ticker (vote/page.js:38). .ticker__track holds two identical
+   .ticker__group copies, so translateX(-50%) lands exactly one group over and
+   the loop is seamless. Sized to match the "total votes" pill beside it. */
+.ticker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  padding: 0.5rem 0.875rem;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 9999px;
+  box-shadow: 0 1px 2px 0 rgba(100, 116, 139, 0.08);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+.ticker__dot {
+  flex-shrink: 0;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background-color: currentColor;
+}
+.ticker__window {
+  position: relative;
+  width: 7.5rem;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    to right, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(
+    to right, transparent, #000 12%, #000 88%, transparent);
+}
+.ticker__track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: tickerScroll 9s linear infinite;
+}
+.ticker__group {
+  display: flex;
+}
+.ticker__item {
+  padding-right: 1.5rem;
+  white-space: nowrap;
+}
+.ticker--open {
+  color: #356f50;
+}
+.ticker--open .ticker__dot {
+  animation: tickerPulse 2s ease-in-out infinite;
+}
+.ticker--closed {
+  color: #64748b;
+}
+@keyframes tickerScroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@keyframes tickerPulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .seg-btn { transition: none; }
+  .fade-up,
+  .tab-panel { animation: none; }
+  .vote-push__front,
+  .vote-push__shadow { transition: none; }
+  .radio-inputs .radio .name { transition: none; }
+  .ticker__track,
+  .ticker--open .ticker__dot { animation: none; }
 }
