@@ -94,12 +94,12 @@ body {
   position: relative;
   border-radius: 8px;
   background: #88bda4;
-  padding: 16px 32px;
-  color: #1b372a;
-  font-weight: 700;
+  padding: 16px 34px;
+  color: #102119;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  font-size: 1rem;
+  font-size: 1.15rem;
   transform: translateY(-4px);
   transition: transform 600ms cubic-bezier(0.3, 0.7, 0.4, 1);
 }

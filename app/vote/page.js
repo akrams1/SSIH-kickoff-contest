@@ -130,22 +130,20 @@ export default function VotePage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6 md:p-12">
+    <div className="min-h-screen bg-slate-50 p-4 md:p-12">
       <div className="max-w-7xl mx-auto">
 
-        <div className="mb-8">
-          <Link href="/" className="inline-flex items-center text-slate-500 hover:text-slate-600 mb-4 transition-colors font-medium text-sm">
+        <div className="mb-6 md:mb-8">
+          <Link href="/" className="inline-flex items-center text-slate-500 hover:text-slate-600 mb-3 md:mb-4 transition-colors font-medium text-sm">
             <ArrowLeft className="w-4 h-4 mr-2" /> Home
           </Link>
 
-          {/* One shared baseline: title · ticker · vote count */}
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            <div className="flex items-center gap-4 min-w-0">
-              <h1 className="text-3xl md:text-4xl font-bold text-green-700 tracking-tight">Costume Gallery</h1>
-              <StatusTicker open={votingOpen} />
-            </div>
-
-            <div className="px-4 py-2 bg-white rounded-full border border-slate-200 text-slate-600 text-sm font-medium flex items-center gap-2 shadow-sm flex-shrink-0">
+          {/* One wrapping row. Desktop: title · ticker · count on one line.
+              Mobile: title wraps to its own line, ticker + count share the next. */}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
+            <h1 className="text-2xl md:text-4xl font-bold text-green-700 tracking-tight">Costume Gallery</h1>
+            <StatusTicker open={votingOpen} />
+            <div className="ml-auto px-3 md:px-4 py-2 bg-white rounded-full border border-slate-200 text-slate-600 text-xs md:text-sm font-medium flex items-center gap-2 shadow-sm flex-shrink-0">
               <Heart className="w-4 h-4 text-green-600 fill-green-600" />
               <span>{totalVotes} total votes</span>
             </div>
@@ -165,7 +163,7 @@ export default function VotePage() {
             <p className="text-slate-500 text-sm mt-1">Check back once entries are added!</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
             {ordered.map((contestant, idx) => {
               const isMine = votedFor === contestant.id;
               const lockedOut = (!!votedFor && !isMine) || !votingOpen;
@@ -173,8 +171,8 @@ export default function VotePage() {
                 <div
                   key={contestant.id}
                   style={{ animationDelay: `${Math.min(idx, 8) * 60}ms` }}
-                  className={`fade-up group bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 transition-all duration-300 ${
-                    isMine ? '' : 'hover:shadow-xl hover:-translate-y-1'
+                  className={`fade-up group bg-white rounded-xl md:rounded-2xl overflow-hidden shadow-sm border border-slate-100 transition-all duration-300 ${
+                    isMine ? '' : 'md:hover:shadow-xl md:hover:-translate-y-1'
                   }`}
                 >
                   <div className="relative aspect-[4/5] bg-slate-100">
@@ -182,26 +180,26 @@ export default function VotePage() {
                       src={cldThumb(contestant.photoURL, 800)}
                       alt={contestant.name}
                       fill
-                      sizes="(max-width: 768px) 100vw, 33vw"
+                      sizes="(max-width: 768px) 50vw, 33vw"
                       className={`object-cover transition-opacity ${lockedOut && !isMine ? 'opacity-80' : ''}`}
                       unoptimized
                     />
                     {isMine && (
-                      <div className="absolute top-3 right-3 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow">
+                      <div className="absolute top-2 right-2 md:top-3 md:right-3 bg-green-600 text-white text-[10px] md:text-xs font-bold px-2 py-0.5 md:px-3 md:py-1 rounded-full flex items-center gap-1 shadow">
                         <Check className="w-3 h-3" /> Your vote
                       </div>
                     )}
                   </div>
 
-                  <div className="p-5 flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-slate-700 truncate pr-4">
+                  <div className="p-3 md:p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-3">
+                    <h3 className="text-sm md:text-lg font-semibold text-slate-700 truncate">
                       {contestant.name}
                     </h3>
 
                     <button
                       onClick={() => handleVote(contestant.id)}
                       disabled={lockedOut || isMine}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all ${
+                      className={`w-full md:w-auto flex items-center justify-center gap-2 px-3 md:px-4 py-2 rounded-full text-sm font-semibold transition-all flex-shrink-0 ${
                         isMine
                           ? 'bg-green-50 text-green-600 cursor-default'
                           : lockedOut
