@@ -12,24 +12,21 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* Palette — light #E6F2DD, dark #88BDA4 (stops 50 and 300).
-   100/200 are interpolated between them. 400–950 are derived by darkening
-   #88BDA4 along its own hue (H152 S29), because #88BDA4 is only 2.13:1 on
-   white — far below the 4.5 body text needs, and a QR at that contrast fails
-   to scan the moment there's dim light or glare (measured: 0/5 vs 5/5).
-   Surfaces stay light; the derived darks carry text and the QR. */
+/* Pastel sage green — remaps every `green-*` utility across the whole app.
+   Light stops carry the soft pastel feel; 600/700 stay dark enough for
+   white-text buttons (600 = 4.77:1) and headings (700 = 5.93:1). */
 @theme {
-  --color-green-50:  #e6f2dd;
-  --color-green-100: #c6e0ca;
-  --color-green-200: #a7ceb7;
-  --color-green-300: #88bda4;
-  --color-green-400: #60a987;
-  --color-green-500: #4c9070;
-  --color-green-600: #3c745a;
-  --color-green-700: #2f5d47;
-  --color-green-800: #244938;
-  --color-green-900: #1b372a;
-  --color-green-950: #102119;
+  --color-green-50:  #f2f9f5;
+  --color-green-100: #e2f2ea;
+  --color-green-200: #c9ecd8;
+  --color-green-300: #a6dcbf;
+  --color-green-400: #78c4a0;
+  --color-green-500: #55ac82;
+  --color-green-600: #37805c;
+  --color-green-700: #356f50;
+  --color-green-800: #2b5a42;
+  --color-green-900: #234636;
+  --color-green-950: #10251b;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -39,94 +36,43 @@
   }
 }
 
-/* Always reserve the scrollbar gutter. Without this, a short tab has no
-   scrollbar and a tall one does, and the whole page jumps sideways on switch. */
-html {
-  scrollbar-gutter: stable;
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Vote CTA — layered "pushable" button (adapted from Uiverse by PriyanshuGupta28).
-   Class names are namespaced: the original uses .shadow/.edge/.front, and
-   `.shadow` would collide with Tailwind's own shadow utility.
-   Front is #88BDA4 with dark-green ink — white text on it is only 2.13:1. */
-.vote-push {
-  position: relative;
-  background: transparent;
-  padding: 0;
-  border: none;
+/* Vote CTA — arcade "kick" button. Two colors: face + shadow. No glow.
+   Fixed size so the letter-spacing press can't reflow.
+   Adapted from Uiverse by btongheng. */
+.vote-btn {
+  --btn: #4f9d74;
+  --btn-shadow: #3d8560;
   cursor: pointer;
-  outline-offset: 4px;
-  outline-color: #2f5d47;
-  transition: filter 250ms;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-  touch-action: manipulation;
-}
-.vote-push__shadow {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  background: #83af9a;
-  border-radius: 8px;
-  filter: blur(2px);
-  will-change: transform;
-  transform: translateY(2px);
-  transition: transform 600ms cubic-bezier(0.3, 0.7, 0.4, 1);
-}
-.vote-push__edge {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  border-radius: 8px;
-  background: linear-gradient(
-    to right,
-    #529877 0%,
-    #67ad8c 8%,
-    #529877 92%,
-    #447e63 100%
-  );
-}
-.vote-push__front {
-  display: block;
-  position: relative;
-  border-radius: 8px;
-  background: #88bda4;
-  padding: 16px 34px;
-  color: #102119;
+  width: 11.5rem;
+  height: 3rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
   font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  font-size: 1.15rem;
-  transform: translateY(-4px);
-  transition: transform 600ms cubic-bezier(0.3, 0.7, 0.4, 1);
+  letter-spacing: 2px;
+  color: #fff;
+  background: var(--btn);
+  border: 2px solid var(--btn-shadow);
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 0 var(--btn-shadow);
+  transform: skew(-10deg);
+  transition: all 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
 }
-.vote-push:hover { filter: brightness(105%); }
-.vote-push:hover .vote-push__front {
-  transform: translateY(-6px);
-  transition: transform 250ms cubic-bezier(0.3, 0.7, 0.4, 1.5);
+.vote-btn:active {
+  letter-spacing: 0px;
+  transform: skew(-10deg) translateY(8px);
+  box-shadow: 0 0 0 var(--btn-shadow);
 }
-.vote-push:active .vote-push__front {
-  transform: translateY(-2px);
-  transition: transform 34ms;
-}
-.vote-push:hover .vote-push__shadow {
-  transform: translateY(4px);
-  transition: transform 250ms cubic-bezier(0.3, 0.7, 0.4, 1.5);
-}
-.vote-push:active .vote-push__shadow {
-  transform: translateY(1px);
-  transition: transform 34ms;
-}
-.vote-push:focus:not(:focus-visible) { outline: none; }
 
 /* Subtle, GPU-friendly entrance — opacity + small translate only. */
 @keyframes fadeUp {
@@ -139,122 +85,48 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .fade-up { animation: none; }
-  .vote-push__front,
-  .vote-push__shadow { transition: none; }
+  .vote-btn,
+  .vote-btn:hover,
+  .vote-btn:active { transition: none; }
 }
 
-/* Admin tab switcher (adapted from Uiverse by Yaya12085). Real radio inputs,
-   so it is keyboard navigable and screen readers announce it as one group. */
-.radio-inputs {
-  position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  border-radius: 0.5rem;
-  background-color: #f1f5f9;
-  box-sizing: border-box;
-  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.06);
-  padding: 0.25rem;
-  width: 100%;
-  max-width: 34rem;
-  font-size: 13px;
-}
-.radio-inputs .radio {
-  flex: 1 1 auto;
-  text-align: center;
-}
-.radio-inputs .radio input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-.radio-inputs .radio .name {
-  display: flex;
-  cursor: pointer;
+/* Admin segmented toggle — subtle keycap press in the app's white/slate tones.
+   Fixed width: letter-spacing on press changes text metrics, and on an
+   auto-width button that reflows every sibling. Fixed width keeps it still. */
+.seg-btn {
+  font: inherit;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.3rem;
-  border-radius: 0.5rem;
-  border: none;
-  padding: 0.5rem 0;
-  color: rgba(51, 65, 85, 1);
-  transition: all 0.15s ease-in-out;
-  white-space: nowrap;
-}
-.radio-inputs .radio input:checked + .name {
-  background-color: #fff;
+  gap: 0.4rem;
+  width: 10.25rem;
+  background-color: #ffffff;
+  border: 0;
+  color: #64748b;
+  font-size: 0.875rem;
   font-weight: 600;
-  color: #2f5d47;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
-}
-/* Visible focus ring for keyboard users — the original hides the input entirely. */
-.radio-inputs .radio input:focus-visible + .name {
-  outline: 2px solid #2f5d47;
-  outline-offset: 1px;
-}
-
-/* Voting-status ticker — bare: status dot + scrolling text, no container.
-   The dot carries the state instantly; the text scrolls through a small fixed
-   window. pointer-events:none — pure display, never reacts to the cursor. */
-.ticker {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-shrink: 0;
-  pointer-events: none;
+  padding: 0.55em 0;
+  box-shadow: inset 0 1px 0 0 #ffffff, 0 1px 0 0 #f1f5f9,
+    0 2px 0 0 #e9eef4, 0 3px 0 0 #e2e8f0, 0 4px 0 0 #dbe2ea,
+    0 4px 7px 0 rgba(100, 116, 139, 0.13);
+  transition: 0.2s ease;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
   user-select: none;
 }
-.ticker__dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.ticker--open   .ticker__dot { background: #4c9070; }
-.ticker--closed .ticker__dot { background: #dc2626; }
-.ticker__window {
-  position: relative;
-  overflow: hidden;
-  width: 8.5rem;
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent);
-          mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent);
-}
-.ticker__track {
-  display: flex;
-  width: max-content;
-  animation: ticker-scroll 9s linear infinite;
-  will-change: transform;
-}
-.ticker__group { display: flex; flex-shrink: 0; }
-.ticker__item {
-  display: inline-flex;
-  align-items: center;
-  padding: 0 0.9rem;
-  white-space: nowrap;
-  font-size: 0.68rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-}
-.ticker--open   .ticker__item { color: #64748b; }
-.ticker--closed .ticker__item { color: #b91c1c; }
-@keyframes ticker-scroll {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+.seg-left  { border-radius: 0.5em 0 0 0.5em; margin-right: -1px; }
+.seg-right { border-radius: 0 0.5em 0.5em 0; }
+.seg-btn:hover { color: #475569; }
+.seg-btn:active,
+.seg-btn.seg-active {
+  translate: 0 3px;
+  letter-spacing: 0.02em;
+  color: #356f50;
+  background-color: #fbfdfc;
+  box-shadow: inset 0 1px 0 0 #ffffff, 0 1px 0 0 #f1f5f9,
+    0 1px 0 0 #e9eef4, 0 1px 0 0 #e2e8f0, 0 1px 0 0 #dbe2ea,
+    0 1px 3px 0 rgba(100, 116, 139, 0.12);
 }
 @media (prefers-reduced-motion: reduce) {
-  .ticker__track { animation: none; }
-}
-
-/* Admin tab panel transition. Opacity + a small translate only — both are
-   compositor properties, so switching tabs cannot reflow the page. Paired with
-   key={activeTab} in React, which remounts the panel and replays this. */
-@keyframes tabPanelIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: none; }
-}
-.tab-panel {
-  animation: tabPanelIn 0.26s cubic-bezier(0.2, 0.7, 0.3, 1) both;
-}
-@media (prefers-reduced-motion: reduce) {
-  .tab-panel { animation: none; }
+  .seg-btn { transition: none; }
 }
