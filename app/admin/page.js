@@ -270,35 +270,30 @@ export default function AdminPage() {
           </div>
         </div>
 
-        {/* Tabs — own row so four fit on any screen */}
-        <div className="flex flex-wrap gap-y-2 mb-6">
-          <button
-            onClick={() => setActiveTab('results')}
-            className={`seg-btn seg-left ${activeTab === 'results' ? 'seg-active' : ''}`}
-          >
-            <Trophy className="w-4 h-4" /> Entries
-          </button>
-          <button
-            onClick={() => setActiveTab('upload')}
-            className={`seg-btn seg-mid ${activeTab === 'upload' ? 'seg-active' : ''}`}
-          >
-            <Plus className="w-4 h-4" /> Upload
-          </button>
-          <button
-            onClick={() => setActiveTab('attendance')}
-            className={`seg-btn seg-mid ${activeTab === 'attendance' ? 'seg-active' : ''}`}
-          >
-            <Users className="w-4 h-4" /> Attendance
-          </button>
-          <button
-            onClick={() => setActiveTab('report')}
-            className={`seg-btn seg-right ${activeTab === 'report' ? 'seg-active' : ''}`}
-          >
-            <FileText className="w-4 h-4" /> Report
-          </button>
+        {/* Tabs */}
+        <div className="radio-inputs mb-6">
+          {[
+            ['results', 'Entries', Trophy],
+            ['upload', 'Upload', Plus],
+            ['attendance', 'Attendance', Users],
+            ['report', 'Report', FileText],
+          ].map(([id, text, Icon]) => (
+            <label className="radio" key={id}>
+              <input
+                type="radio"
+                name="admin-tab"
+                checked={activeTab === id}
+                onChange={() => setActiveTab(id)}
+              />
+              <span className="name">
+                <Icon className="w-3.5 h-3.5" />
+                {text}
+              </span>
+            </label>
+          ))}
         </div>
 
-        <div key={activeTab} className="animate-in fade-in slide-in-from-bottom-4 duration-500 ease-in-out fill-mode-forwards">
+        <div key={activeTab} className="animate-in fade-in duration-300">
           {activeTab === 'results' && (
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
               <div className="overflow-x-auto">

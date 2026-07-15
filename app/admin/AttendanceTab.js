@@ -5,13 +5,14 @@ import { db } from '@/lib/firebase';
 import {
   collection, query, orderBy, onSnapshot, addDoc, deleteDoc, doc, serverTimestamp,
 } from 'firebase/firestore';
-import { UserPlus, Trash2, Search, Loader2, Users, X } from 'lucide-react';
+import { UserPlus, Trash2, Search, Loader2, Users, X, AlertCircle } from 'lucide-react';
 
 const norm = (s) => s.trim().toLowerCase();
 
 export default function AttendanceTab() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [entry, setEntry] = useState('');
   const [type, setType] = useState('resident');
   const [filter, setFilter] = useState('');
@@ -22,10 +23,20 @@ export default function AttendanceTab() {
 
   useEffect(() => {
     const q = query(collection(db, 'attendees'), orderBy('createdAt', 'desc'));
-    const unsub = onSnapshot(q, (snap) => {
-      setRows(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-      setLoading(false);
-    });
+    const unsub = onSnapshot(
+      q,
+      (snap) => {
+        setRows(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+        setError(null);
+        setLoading(false);
+      },
+      (err) => {
+        // Never leave the spinner running: surface the reason instead.
+        console.error('Attendance listener error:', err);
+        setError(err.code === 'permission-denied' ? 'permission' : 'unknown');
+        setLoading(false);
+      }
+    );
     return () => {
       unsub();
       if (flashTimer.current) clearTimeout(flashTimer.current);
@@ -92,6 +103,24 @@ export default function AttendanceTab() {
     return (
       <div className="py-16 flex justify-center">
         <Loader2 className="w-7 h-7 text-green-600 animate-spin" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-lg mx-auto bg-red-50 border border-red-200 rounded-2xl p-6 text-center">
+        <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-3" />
+        <p className="font-semibold text-red-700 mb-1">Cannot read the attendance list</p>
+        {error === 'permission' ? (
+          <p className="text-sm text-red-600">
+            Firestore denied the request. The <code className="font-mono">attendees</code> rules have not been
+            published yet — paste <code className="font-mono">firestore.rules</code> into Firebase Console →
+            Firestore → Rules → Publish, then reload.
+          </p>
+        ) : (
+          <p className="text-sm text-red-600">Check your connection and reload. Details are in the browser console.</p>
+        )}
       </div>
     );
   }

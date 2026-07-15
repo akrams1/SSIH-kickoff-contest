@@ -22,7 +22,6 @@ const BLANK = {
   objectives: '',
   execution: '',
   votingSystem: '',
-  votingPoints: '',
   challenges: [{ issue: '', resolution: '' }],
 };
 
@@ -72,14 +71,20 @@ export default function ReportTab() {
   };
 
   useEffect(() => {
-    const unsubC = onSnapshot(query(collection(db, 'contestants'), orderBy('votes', 'desc')), (snap) => {
-      const d = snap.docs.map((x) => ({ id: x.id, ...x.data() }));
-      d.sort(rankSort);
-      setContestants(d);
-    });
-    const unsubA = onSnapshot(query(collection(db, 'attendees'), orderBy('createdAt', 'asc')), (snap) => {
-      setAttendees(snap.docs.map((x) => ({ id: x.id, ...x.data() })));
-    });
+    const unsubC = onSnapshot(
+      query(collection(db, 'contestants'), orderBy('votes', 'desc')),
+      (snap) => {
+        const d = snap.docs.map((x) => ({ id: x.id, ...x.data() }));
+        d.sort(rankSort);
+        setContestants(d);
+      },
+      (err) => console.error('Contestants listener error:', err)
+    );
+    const unsubA = onSnapshot(
+      query(collection(db, 'attendees'), orderBy('createdAt', 'asc')),
+      (snap) => setAttendees(snap.docs.map((x) => ({ id: x.id, ...x.data() }))),
+      (err) => console.error('Attendees listener error:', err)
+    );
 
     getDoc(doc(db, 'report', 'draft'))
       .then((s) => {
@@ -205,13 +210,18 @@ export default function ReportTab() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-5">
-      {/* auto-included summary */}
-      <div className="bg-green-50 border border-green-200 rounded-2xl p-4 text-sm text-green-800">
-        <p className="font-semibold mb-1">Pulled in automatically</p>
-        <p className="text-green-700">
-          {contestants.length} contestants and their votes · {residentCount} residents · {visitorCount} visitors ·
-          the voting QR code. You only fill in the write-up below.
-        </p>
+      {/* Pulled in automatically */}
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          ['Contestants', contestants.length],
+          ['Residents', residentCount],
+          ['Visitors', visitorCount],
+        ].map(([label, n]) => (
+          <div key={label} className="bg-white rounded-xl border border-slate-200 p-3 text-center shadow-sm">
+            <p className="text-2xl font-bold text-green-700 leading-none">{n}</p>
+            <p className="text-[10px] uppercase tracking-widest text-slate-500 mt-1.5">{label}</p>
+          </div>
+        ))}
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
@@ -219,23 +229,23 @@ export default function ReportTab() {
         <div className="grid md:grid-cols-2 gap-4">
           <div>
             <label className={label}>Prepared by</label>
-            <input className={field} value={form.preparedBy} onChange={(e) => set('preparedBy', e.target.value)} placeholder="akram" />
+            <input className={field} value={form.preparedBy} onChange={(e) => set('preparedBy', e.target.value)} />
           </div>
           <div>
             <label className={label}>Report title</label>
-            <input className={field} value={form.reportTitle} onChange={(e) => set('reportTitle', e.target.value)} placeholder="SSIH Summer Kick Off 2026" />
+            <input className={field} value={form.reportTitle} onChange={(e) => set('reportTitle', e.target.value)} />
           </div>
           <div>
             <label className={label}>Event</label>
-            <input className={field} value={form.eventName} onChange={(e) => set('eventName', e.target.value)} placeholder="SSIH Summer Kick Off (End of Semester Party)" />
+            <input className={field} value={form.eventName} onChange={(e) => set('eventName', e.target.value)} />
           </div>
           <div>
             <label className={label}>Date</label>
-            <input className={field} value={form.date} onChange={(e) => set('date', e.target.value)} placeholder="July 18, 2026 (Saturday)" />
+            <input className={field} value={form.date} onChange={(e) => set('date', e.target.value)} />
           </div>
           <div>
             <label className={label}>Time</label>
-            <input className={field} value={form.time} onChange={(e) => set('time', e.target.value)} placeholder="18:00 – 21:30 (including cleanup)" />
+            <input className={field} value={form.time} onChange={(e) => set('time', e.target.value)} />
           </div>
           <div>
             <label className={label}>Location</label>
@@ -243,12 +253,7 @@ export default function ReportTab() {
           </div>
           <div className="md:col-span-2">
             <label className={label}>Attendees line</label>
-            <input
-              className={field}
-              value={form.attendeesNote}
-              onChange={(e) => set('attendeesNote', e.target.value)}
-              placeholder={`Approx. ${attendees.length} (residents and visitors)`}
-            />
+            <input className={field} value={form.attendeesNote} onChange={(e) => set('attendeesNote', e.target.value)} />
           </div>
         </div>
       </div>
@@ -256,36 +261,32 @@ export default function ReportTab() {
       <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
         <h3 className="font-bold text-slate-700">Write-up</h3>
         <div>
-          <label className={label}>1 · Introduction</label>
-          <textarea rows={4} className={field} value={form.introduction} onChange={(e) => set('introduction', e.target.value)} placeholder="Blank line = new paragraph." />
+          <label className={label}>Introduction</label>
+          <textarea rows={4} className={field} value={form.introduction} onChange={(e) => set('introduction', e.target.value)} />
         </div>
         <div>
           <label className={label}>Objectives (one per line)</label>
-          <textarea rows={3} className={field} value={form.objectives} onChange={(e) => set('objectives', e.target.value)} placeholder={'To welcome residents…\nTo encourage socialization…'} />
+          <textarea rows={3} className={field} value={form.objectives} onChange={(e) => set('objectives', e.target.value)} />
         </div>
         <div>
-          <label className={label}>2 · Event execution & activities</label>
+          <label className={label}>Event execution & activities</label>
           <textarea rows={4} className={field} value={form.execution} onChange={(e) => set('execution', e.target.value)} />
         </div>
         <div>
-          <label className={label}>3 · Voting system</label>
+          <label className={label}>Voting system</label>
           <textarea rows={3} className={field} value={form.votingSystem} onChange={(e) => set('votingSystem', e.target.value)} />
-        </div>
-        <div>
-          <label className={label}>Voting system points (one per line)</label>
-          <textarea rows={3} className={field} value={form.votingPoints} onChange={(e) => set('votingPoints', e.target.value)} placeholder={'Vote Once Policy: one final vote per person.\nLive Tally: votes tallied in real time.'} />
         </div>
 
         <div>
-          <label className={label}>4 · Challenges & resolutions</label>
+          <label className={label}>Challenges & resolutions</label>
           <div className="space-y-3">
             {form.challenges.map((c, i) => (
               <div key={i} className="bg-slate-50 rounded-xl p-3 border border-slate-200">
                 <div className="flex items-start gap-2">
                   <span className="text-xs font-bold text-slate-500 mt-2.5">{i + 1}.</span>
                   <div className="flex-1 space-y-2">
-                    <input className={field} value={c.issue} onChange={(e) => setChallenge(i, 'issue', e.target.value)} placeholder="What went wrong" />
-                    <input className={field} value={c.resolution} onChange={(e) => setChallenge(i, 'resolution', e.target.value)} placeholder="How it was resolved" />
+                    <input className={field} value={c.issue} onChange={(e) => setChallenge(i, 'issue', e.target.value)} />
+                    <input className={field} value={c.resolution} onChange={(e) => setChallenge(i, 'resolution', e.target.value)} />
                   </div>
                   {form.challenges.length > 1 && (
                     <button onClick={() => removeChallenge(i)} className="p-1.5 text-slate-400 hover:text-red-500 rounded" title="Remove">
@@ -351,7 +352,7 @@ export default function ReportTab() {
         <button
           onClick={generate}
           disabled={generating}
-          className="flex-1 px-5 py-3 bg-green-600 hover:bg-green-700 disabled:bg-slate-300 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors shadow-lg shadow-green-100"
+          className="flex-1 px-5 py-3 bg-green-600 hover:bg-green-700 disabled:bg-slate-300 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors"
         >
           {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
           Generate PDF
