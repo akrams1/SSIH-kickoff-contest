@@ -9,7 +9,7 @@ import {
 import { cldThumb } from '@/lib/img';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Heart, ArrowLeft, Loader2, Shirt, Check, Lock } from 'lucide-react';
+import { Heart, ArrowLeft, Loader2, Shirt, Check } from 'lucide-react';
 
 // Bump this key if you redeploy on a domain that ran a previous event,
 // so returning voters aren't blocked by an old record.
@@ -34,14 +34,10 @@ function hashKey(id, seed) {
 // readers hear the status once.
 function StatusTicker({ open }) {
   const label = open ? 'Voting is open' : 'Voting has closed';
-  const Icon = open ? Heart : Lock;
   const group = (hidden) => (
     <div className="marquee__group" aria-hidden={hidden || undefined}>
-      {Array.from({ length: 6 }).map((_, i) => (
-        <span className="marquee__item" key={i}>
-          <Icon className={`w-3 h-3 flex-shrink-0 ${open ? 'fill-current' : ''}`} />
-          {label}
-        </span>
+      {Array.from({ length: 2 }).map((_, i) => (
+        <span className="marquee__item" key={i}>{label}</span>
       ))}
     </div>
   );
@@ -145,8 +141,8 @@ export default function VotePage() {
             )}
           </div>
 
-          {/* Scrolling voting-status ticker */}
-          <div className="md:flex-1 md:mx-6 min-w-0 order-last md:order-none">
+          {/* Scrolling voting-status ticker — sits beside the title */}
+          <div className="md:mr-auto order-last md:order-none">
             <StatusTicker open={votingOpen} />
           </div>
 
