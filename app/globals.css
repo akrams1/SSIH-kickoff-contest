@@ -42,36 +42,79 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Vote CTA — arcade "kick" button. Two colors: face + shadow. No glow.
-   Fixed size so the letter-spacing press can't reflow.
-   Adapted from Uiverse by btongheng. */
-.vote-btn {
-  --btn: #4f9d74;
-  --btn-shadow: #3d8560;
+/* Vote CTA — layered pushable button. Face = green-600 (4.77:1 on white,
+   the ramp's floor for white text). Edge/shadow are decorative.
+   Adapted from Uiverse. Namespaced: bare .shadow collides with Tailwind. */
+.vote-push {
+  position: relative;
+  background: transparent;
+  padding: 0;
+  border: none;
   cursor: pointer;
-  width: 11.5rem;
-  height: 3rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  font-weight: 800;
-  letter-spacing: 2px;
-  color: #fff;
-  background: var(--btn);
-  border: 2px solid var(--btn-shadow);
-  border-radius: 0.75rem;
-  box-shadow: 0 8px 0 var(--btn-shadow);
-  transform: skew(-10deg);
-  transition: all 0.1s ease;
+  outline-offset: 4px;
+  outline-color: #55ac82;
+  transition: filter 250ms;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
-  user-select: none;
 }
-.vote-btn:active {
-  letter-spacing: 0px;
-  transform: skew(-10deg) translateY(8px);
-  box-shadow: 0 0 0 var(--btn-shadow);
+.vote-push__shadow {
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  background: #2b5a42;
+  filter: blur(2px);
+  will-change: transform;
+  transform: translateY(2px);
+  transition: transform 600ms cubic-bezier(0.3, 0.7, 0.4, 1);
+}
+.vote-push__edge {
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  background: linear-gradient(
+    to right,
+    #2b5a42 0%,
+    #356f50 8%,
+    #356f50 92%,
+    #234636 100%
+  );
+}
+.vote-push__front {
+  display: block;
+  position: relative;
+  border-radius: 8px;
+  background: #37805c;
+  padding: 16px 32px;
+  min-width: 11.5rem;
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  font-size: 1rem;
+  text-transform: uppercase;
+  transform: translateY(-4px);
+  transition: transform 600ms cubic-bezier(0.3, 0.7, 0.4, 1);
+}
+.vote-push:hover {
+  filter: brightness(110%);
+}
+.vote-push:hover .vote-push__front {
+  transform: translateY(-6px);
+  transition: transform 250ms cubic-bezier(0.3, 0.7, 0.4, 1.5);
+}
+.vote-push:active .vote-push__front {
+  transform: translateY(-2px);
+  transition: transform 34ms;
+}
+.vote-push:hover .vote-push__shadow {
+  transform: translateY(4px);
+  transition: transform 250ms cubic-bezier(0.3, 0.7, 0.4, 1.5);
+}
+.vote-push:active .vote-push__shadow {
+  transform: translateY(1px);
+  transition: transform 34ms;
+}
+.vote-push:focus:not(:focus-visible) {
+  outline: none;
 }
 
 /* Subtle, GPU-friendly entrance — opacity + small translate only. */
@@ -85,9 +128,8 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .fade-up { animation: none; }
-  .vote-btn,
-  .vote-btn:hover,
-  .vote-btn:active { transition: none; }
+  .vote-push__front,
+  .vote-push__shadow { transition: none; }
 }
 
 /* Admin segmented toggle — subtle keycap press in the app's white/slate tones.
