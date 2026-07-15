@@ -250,7 +250,7 @@ export default function AdminPage() {
             <button
               onClick={toggleVoting}
               disabled={togglingVoting}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold shadow-sm border transition-all flex items-center gap-2 disabled:opacity-60 ${
+              className={`w-36 justify-center px-3 py-2 rounded-xl text-sm font-semibold shadow-sm border transition-colors flex items-center gap-2 disabled:opacity-60 ${
                 votingOpen
                   ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100'
                   : 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100'

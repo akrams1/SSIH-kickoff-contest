@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Trophy, X, Maximize2 } from 'lucide-react';
+import { Lock, X, Maximize2 } from 'lucide-react';
 import { Dancing_Script } from 'next/font/google';
 
 const dancingScript = Dancing_Script({
@@ -60,7 +60,6 @@ export default function Home() {
           {/* Vote CTA — arcade kick button */}
           <div className="w-full mb-12 flex justify-center">
             <button onClick={handleStart} className="vote-btn select-none">
-              <Trophy className="w-7 h-7 text-yellow-500" />
               LET&rsquo;S VOTE
             </button>
           </div>

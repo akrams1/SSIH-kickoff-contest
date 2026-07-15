@@ -42,46 +42,38 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Vote CTA — soft pastel "kick" button. Mint face, deep-green ink, a gentle
-   arcade press. Adapted from Uiverse by btongheng. */
+/* Vote CTA — arcade "kick" button. Two colors: face + shadow (the glow is just
+   the face at low alpha). Fixed size so the letter-spacing press can't reflow.
+   Adapted from Uiverse by btongheng. */
 .vote-btn {
-  --face: #c9ecd8;
-  --edge: #93d6b6;
-  --shadow: #77c8a1;
-  --ink: #15533a;
+  --btn: #469269;
+  --btn-shadow: #35704f;
+  --btn-glow: #46926963;
   cursor: pointer;
+  width: 11.5rem;
+  height: 3rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.7rem;
-  padding: 0.9rem 2.6rem;
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   font-weight: 800;
   letter-spacing: 2px;
-  color: var(--ink);
-  background: var(--face);
-  border: 2px solid var(--edge);
-  border-radius: 0.9rem;
-  box-shadow: 0 7px 0 var(--shadow);
-  transform: skew(-9deg);
-  filter: drop-shadow(0 10px 14px rgba(119, 200, 161, 0.35));
-  transition: transform 0.13s cubic-bezier(0.2, 0.7, 0.3, 1),
-              box-shadow 0.13s cubic-bezier(0.2, 0.7, 0.3, 1),
-              letter-spacing 0.13s ease;
-  will-change: transform;
+  color: #fff;
+  background: var(--btn);
+  border: 2px solid var(--btn-shadow);
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 0 var(--btn-shadow);
+  transform: skew(-10deg);
+  transition: all 0.1s ease;
+  filter: drop-shadow(0 15px 20px var(--btn-glow));
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
   user-select: none;
 }
-.vote-btn:hover {
-  transform: skew(-9deg) translateY(-2px);
-  box-shadow: 0 9px 0 var(--shadow);
-}
 .vote-btn:active {
-  letter-spacing: 0.5px;
-  transform: skew(-9deg) translateY(7px);
-  box-shadow: 0 0 0 var(--shadow);
-  filter: drop-shadow(0 3px 6px rgba(119, 200, 161, 0.3));
+  letter-spacing: 0px;
+  transform: skew(-10deg) translateY(8px);
+  box-shadow: 0 0 0 var(--btn-glow);
 }
 
 /* Subtle, GPU-friendly entrance — opacity + small translate only. */
@@ -100,38 +92,42 @@ body {
   .vote-btn:active { transition: none; }
 }
 
-/* Admin segmented toggle — keycap press. Adapted from Uiverse by elijahgummer.
-   Active (selected) tab stays pressed-in with a green label; inactive sits raised. */
+/* Admin segmented toggle — subtle keycap press in the app's white/slate tones.
+   Fixed width: letter-spacing on press changes text metrics, and on an
+   auto-width button that reflows every sibling. Fixed width keeps it still. */
 .seg-btn {
   font: inherit;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.4rem;
-  background-color: #f2f2f0;
+  width: 10.25rem;
+  background-color: #ffffff;
   border: 0;
-  color: #3f3f46;
-  font-size: 0.9rem;
-  font-weight: 700;
-  padding: 0.5em 1.05em;
-  text-shadow: 0 0.0625em 0 #fff;
-  box-shadow: inset 0 0.0625em 0 0 #f6f6f4, 0 0.0625em 0 0 #efefec,
-    0 0.125em 0 0 #eaeae6, 0 0.25em 0 0 #e0e0dc, 0 0.3125em 0 0 #dcdcd7,
-    0 0.375em 0 0 #d7d7d1, 0 0.425em 0 0 #c7c7c1, 0 0.425em 0.5em 0 #cbcbc5;
+  color: #64748b;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.55em 0;
+  box-shadow: inset 0 1px 0 0 #ffffff, 0 1px 0 0 #f1f5f9,
+    0 2px 0 0 #e9eef4, 0 3px 0 0 #e2e8f0, 0 4px 0 0 #dbe2ea,
+    0 4px 7px 0 rgba(100, 116, 139, 0.13);
   transition: 0.2s ease;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
 }
-.seg-left  { border-radius: 0; border-top-left-radius: 0.5em; border-bottom-left-radius: 0.5em; margin-right: -1px; }
-.seg-right { border-radius: 0; border-top-right-radius: 0.5em; border-bottom-right-radius: 0.5em; }
+.seg-left  { border-radius: 0.5em 0 0 0.5em; margin-right: -1px; }
+.seg-right { border-radius: 0 0.5em 0.5em 0; }
+.seg-btn:hover { color: #475569; }
 .seg-btn:active,
 .seg-btn.seg-active {
-  translate: 0 0.225em;
-  letter-spacing: 0.03em;
+  translate: 0 3px;
+  letter-spacing: 0.02em;
   color: #356f50;
-  box-shadow: inset 0 0.03em 0 0 #f6f6f4, 0 0.03em 0 0 #efefec,
-    0 0.0625em 0 0 #eaeae6, 0 0.125em 0 0 #dedede, 0 0.125em 0 0 #dcdcd7,
-    0 0.2em 0 0 #d7d7d1, 0 0.225em 0 0 #c7c7c1, 0 0.225em 0.375em 0 #cbcbc5;
+  background-color: #fbfdfc;
+  box-shadow: inset 0 1px 0 0 #ffffff, 0 1px 0 0 #f1f5f9,
+    0 1px 0 0 #e9eef4, 0 1px 0 0 #e2e8f0, 0 1px 0 0 #dbe2ea,
+    0 1px 3px 0 rgba(100, 116, 139, 0.12);
 }
 @media (prefers-reduced-motion: reduce) {
   .seg-btn { transition: none; }
