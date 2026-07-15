@@ -25,7 +25,7 @@ const PUSH = 1.15;       // repulsion strength
 const SPRING = 0.055;    // pull home — lower = heavier, slower return
 const DAMP = 0.9;        // momentum retained per frame — higher = more coast
 const MAX_OFFSET = 34;   // cap so dots never fly across the page
-const BASE_R = 1.5;
+const BASE_R = 1.8;
 const GROW = 0.55;       // gentle size lift near the cursor
 const MAX_DOTS = 2600;
 const REST = 0.015;      // speed below which we call it settled
@@ -97,13 +97,16 @@ export default function DotGrid({ className = '' }) {
         if (speed > maxSpeed) maxSpeed = speed;
 
         // --- paint ---
+        // #88bda4 at rest -> #3c745a near the cursor. These alphas are chosen so
+        // the dots are actually visible on bg-slate-50: the previous, paler mix
+        // rendered at ~1.22 contrast, i.e. invisible at this size.
         const r = BASE_R * (1 + GROW * near);
-        const cr = (177 + (76 - 177) * near) | 0;
-        const cg = (211 + (144 - 211) * near) | 0;
-        const cb = (185 + (112 - 185) * near) | 0;
+        const cr = (136 + (60 - 136) * near) | 0;
+        const cg = (189 + (116 - 189) * near) | 0;
+        const cb = (164 + (90 - 164) * near) | 0;
         ctx.beginPath();
         ctx.arc(d.x, d.y, r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${cr},${cg},${cb},${0.45 + 0.4 * near})`;
+        ctx.fillStyle = `rgba(${cr},${cg},${cb},${0.7 + 0.25 * near})`;
         ctx.fill();
       }
 

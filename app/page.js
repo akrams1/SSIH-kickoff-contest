@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, X, Maximize2 } from 'lucide-react';
 import { Dancing_Script } from 'next/font/google';
 import StyledQR from './StyledQR';
+import DotGrid from './DotGrid';
 
 const dancingScript = Dancing_Script({
   subsets: ['latin'],
@@ -39,6 +40,9 @@ export default function Home() {
       {/* Soft static wash — calm, no continuous animation (mobile-friendly) */}
       <div className="absolute -top-24 -left-24 w-[460px] h-[460px] bg-green-200 rounded-full blur-3xl opacity-50 z-0 pointer-events-none" />
       <div className="absolute -bottom-24 -right-24 w-[460px] h-[460px] bg-green-50 rounded-full blur-3xl opacity-70 z-0 pointer-events-none" />
+
+      {/* Cursor-reactive dot grid — landing screen only */}
+      <DotGrid className="absolute inset-0 w-full h-full z-0 pointer-events-none" />
 
       <div className="max-w-md w-full relative z-10">
         <div className="fade-up bg-white/70 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white/50 p-10 text-center flex flex-col items-center">
