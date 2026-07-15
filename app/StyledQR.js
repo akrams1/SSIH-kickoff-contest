@@ -20,9 +20,9 @@ const qrOptions = (data, size) => ({
   image: '/logo-mark.png',
   margin: 8,
   qrOptions: { errorCorrectionLevel: 'H' },
-  dotsOptions: { type: 'rounded', color: '#234636' },
-  cornersSquareOptions: { type: 'extra-rounded', color: '#234636' },
-  cornersDotOptions: { type: 'dot', color: '#234636' },
+  dotsOptions: { type: 'rounded', color: '#1d3831' },
+  cornersSquareOptions: { type: 'extra-rounded', color: '#1d3831' },
+  cornersDotOptions: { type: 'dot', color: '#1d3831' },
   backgroundOptions: { color: '#ffffff' },
   imageOptions: {
     hideBackgroundDots: true,

@@ -12,21 +12,25 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* Pastel sage green — remaps every `green-*` utility across the whole app.
-   Light stops carry the soft pastel feel; 600/700 stay dark enough for
-   white-text buttons (600 = 4.77:1) and headings (700 = 5.93:1). */
+/* Palette — anchored on the supplied colours:
+     #E6F2DD (50) · #B1D3B9 (200) · #88BDA4 (300) · #659287 (500)
+   100 and 400 are interpolated between them. 600–950 are derived by darkening
+   #659287 along its own hue, because the supplied set tops out at 3.49:1 on
+   white — not enough for body text (needs 4.5) or a reliable QR. The derived
+   darks keep text and the QR readable while staying in the same colour family.
+   Remaps every `green-*` utility across the whole app. */
 @theme {
-  --color-green-50:  #f2f9f5;
-  --color-green-100: #e2f2ea;
-  --color-green-200: #c9ecd8;
-  --color-green-300: #a6dcbf;
-  --color-green-400: #78c4a0;
-  --color-green-500: #55ac82;
-  --color-green-600: #37805c;
-  --color-green-700: #356f50;
-  --color-green-800: #2b5a42;
-  --color-green-900: #234636;
-  --color-green-950: #10251b;
+  --color-green-50:  #e6f2dd;
+  --color-green-100: #cce2cb;
+  --color-green-200: #b1d3b9;
+  --color-green-300: #88bda4;
+  --color-green-400: #76a896;
+  --color-green-500: #659287;
+  --color-green-600: #49776b;
+  --color-green-700: #366056;
+  --color-green-800: #284b42;
+  --color-green-900: #1d3831;
+  --color-green-950: #10201c;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -42,20 +46,19 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Vote CTA — arcade "kick" button. Two colors: face + shadow (the glow is just
-   the face at low alpha). Fixed size so the letter-spacing press can't reflow.
+/* Vote CTA — arcade "kick" button. Two colors: face + shadow. No glow.
+   Fixed size so the letter-spacing press can't reflow.
    Adapted from Uiverse by btongheng. */
 .vote-btn {
-  --btn: #469269;
-  --btn-shadow: #35704f;
-  --btn-glow: #46926963;
+  --btn: #659287;
+  --btn-shadow: #49776b;
   cursor: pointer;
   width: 11.5rem;
   height: 3rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   font-weight: 800;
   letter-spacing: 2px;
   color: #fff;
@@ -65,7 +68,6 @@ body {
   box-shadow: 0 8px 0 var(--btn-shadow);
   transform: skew(-10deg);
   transition: all 0.1s ease;
-  filter: drop-shadow(0 15px 20px var(--btn-glow));
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
   user-select: none;
@@ -73,7 +75,7 @@ body {
 .vote-btn:active {
   letter-spacing: 0px;
   transform: skew(-10deg) translateY(8px);
-  box-shadow: 0 0 0 var(--btn-glow);
+  box-shadow: 0 0 0 var(--btn-shadow);
 }
 
 /* Subtle, GPU-friendly entrance — opacity + small translate only. */
@@ -123,8 +125,8 @@ body {
 .seg-btn.seg-active {
   translate: 0 3px;
   letter-spacing: 0.02em;
-  color: #356f50;
-  background-color: #fbfdfc;
+  color: #366056;
+  background-color: #fbfdfa;
   box-shadow: inset 0 1px 0 0 #ffffff, 0 1px 0 0 #f1f5f9,
     0 1px 0 0 #e9eef4, 0 1px 0 0 #e2e8f0, 0 1px 0 0 #dbe2ea,
     0 1px 3px 0 rgba(100, 116, 139, 0.12);

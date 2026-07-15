@@ -184,7 +184,7 @@ export default function AdminPage() {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 relative overflow-hidden">
         <div className="absolute top-[-10%] right-[-10%] w-96 h-96 bg-green-100 rounded-full mix-blend-multiply filter blur-3xl opacity-40"></div>
-        <div className="absolute bottom-[-10%] left-[-10%] w-96 h-96 bg-yellow-100 rounded-full mix-blend-multiply filter blur-3xl opacity-40"></div>
+        <div className="absolute bottom-[-10%] left-[-10%] w-96 h-96 bg-green-50 rounded-full mix-blend-multiply filter blur-3xl opacity-60"></div>
 
         <div className="max-w-sm w-full relative z-10 animate-in fade-in zoom-in-95 duration-500">
           <Link href="/" className="inline-flex items-center text-slate-500 hover:text-slate-600 mb-6 transition-colors font-medium text-sm">

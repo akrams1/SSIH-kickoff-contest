@@ -37,8 +37,8 @@ export default function Home() {
     <div className="min-h-screen bg-slate-50 relative overflow-hidden flex flex-col items-center justify-center p-6">
 
       {/* Soft static wash — calm, no continuous animation (mobile-friendly) */}
-      <div className="absolute -top-24 -left-24 w-[460px] h-[460px] bg-green-100 rounded-full blur-3xl opacity-50 z-0 pointer-events-none" />
-      <div className="absolute -bottom-24 -right-24 w-[460px] h-[460px] bg-yellow-100 rounded-full blur-3xl opacity-50 z-0 pointer-events-none" />
+      <div className="absolute -top-24 -left-24 w-[460px] h-[460px] bg-green-200 rounded-full blur-3xl opacity-50 z-0 pointer-events-none" />
+      <div className="absolute -bottom-24 -right-24 w-[460px] h-[460px] bg-green-50 rounded-full blur-3xl opacity-70 z-0 pointer-events-none" />
 
       <div className="max-w-md w-full relative z-10">
         <div className="fade-up bg-white/70 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-white/50 p-10 text-center flex flex-col items-center">
@@ -126,7 +126,7 @@ export default function Home() {
                 />
             </motion.div>
             <div className="mt-8 text-center">
-                <h2 className={`${dancingScript.className} text-6xl text-yellow-400 mb-2`}>Scan to Vote</h2>
+                <h2 className={`${dancingScript.className} text-6xl text-green-200 mb-2`}>Scan to Vote</h2>
             </div>
           </motion.div>
         )}
