@@ -35,18 +35,21 @@ function hashKey(id, seed) {
 function StatusTicker({ open }) {
   const label = open ? 'Voting is open' : 'Voting has closed';
   const group = (hidden) => (
-    <div className="marquee__group" aria-hidden={hidden || undefined}>
+    <span className="ticker__group" aria-hidden={hidden || undefined}>
       {Array.from({ length: 2 }).map((_, i) => (
-        <span className="marquee__item" key={i}>{label}</span>
+        <span className="ticker__item" key={i}>{label}</span>
       ))}
-    </div>
+    </span>
   );
   return (
-    <div className={`marquee ${open ? 'marquee--open' : 'marquee--closed'}`} role="status">
-      <div className="marquee__track">
-        {group(false)}
-        {group(true)}
-      </div>
+    <div className={`ticker ${open ? 'ticker--open' : 'ticker--closed'}`} role="status">
+      <span className="ticker__dot" />
+      <span className="ticker__window">
+        <span className="ticker__track">
+          {group(false)}
+          {group(true)}
+        </span>
+      </span>
     </div>
   );
 }
@@ -130,26 +133,27 @@ export default function VotePage() {
     <div className="min-h-screen bg-slate-50 p-6 md:p-12">
       <div className="max-w-7xl mx-auto">
 
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-          <div className="md:flex-shrink-0">
-            <Link href="/" className="inline-flex items-center text-slate-500 hover:text-slate-600 mb-4 transition-colors font-medium text-sm">
-              <ArrowLeft className="w-4 h-4 mr-2" /> Home
-            </Link>
-            <h1 className="text-3xl md:text-4xl font-bold text-green-700 tracking-tight">Costume Gallery</h1>
-            {votingOpen && (
-              <p className="text-slate-500 mt-1">Pick your favorite — one vote each.</p>
-            )}
+        <div className="mb-8">
+          <Link href="/" className="inline-flex items-center text-slate-500 hover:text-slate-600 mb-4 transition-colors font-medium text-sm">
+            <ArrowLeft className="w-4 h-4 mr-2" /> Home
+          </Link>
+
+          {/* One shared baseline: title · ticker · vote count */}
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-center gap-4 min-w-0">
+              <h1 className="text-3xl md:text-4xl font-bold text-green-700 tracking-tight">Costume Gallery</h1>
+              <StatusTicker open={votingOpen} />
+            </div>
+
+            <div className="px-4 py-2 bg-white rounded-full border border-slate-200 text-slate-600 text-sm font-medium flex items-center gap-2 shadow-sm flex-shrink-0">
+              <Heart className="w-4 h-4 text-green-600 fill-green-600" />
+              <span>{totalVotes} total votes</span>
+            </div>
           </div>
 
-          {/* Scrolling voting-status ticker — sits beside the title */}
-          <div className="md:mr-auto order-last md:order-none">
-            <StatusTicker open={votingOpen} />
-          </div>
-
-          <div className="px-4 py-2 bg-white rounded-full border border-slate-200 text-slate-600 text-sm font-medium flex items-center gap-2 shadow-sm self-start md:self-auto flex-shrink-0">
-            <Heart className="w-4 h-4 text-green-600 fill-green-600" />
-            <span>{totalVotes} total votes</span>
-          </div>
+          {votingOpen && (
+            <p className="text-slate-500 mt-2">Pick your favorite — one vote each.</p>
+          )}
         </div>
 
         {ordered.length === 0 ? (

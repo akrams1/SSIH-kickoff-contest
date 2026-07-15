@@ -178,49 +178,55 @@ body {
   .seg-btn { transition: none; }
 }
 
-/* Voting-status ticker. Fixed narrow width so one sentence scrolls through a
-   small window rather than tiling across the header. Two identical groups +
-   translateX(-50%) = seamless loop, no JS. pointer-events:none — it is pure
-   display and must never react to the cursor. Reduced-motion stops it and the
-   text still reads, so status is never animation-dependent. */
-.marquee {
-  position: relative;
-  overflow: hidden;
-  border-radius: 999px;
-  padding: 0.4rem 0;
-  width: 11rem;
+/* Voting-status ticker — bare: status dot + scrolling text, no container.
+   The dot carries the state instantly; the text scrolls through a small fixed
+   window. pointer-events:none — pure display, never reacts to the cursor. */
+.ticker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   flex-shrink: 0;
   pointer-events: none;
   user-select: none;
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
-          mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
 }
-.marquee__track {
-  display: flex;
-  width: max-content;
-  animation: marquee-scroll 8s linear infinite;
-  will-change: transform;
-}
-.marquee__group {
-  display: flex;
+.ticker__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
   flex-shrink: 0;
 }
-.marquee__item {
+.ticker--open   .ticker__dot { background: #4c9070; }
+.ticker--closed .ticker__dot { background: #dc2626; }
+.ticker__window {
+  position: relative;
+  overflow: hidden;
+  width: 8.5rem;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent);
+          mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent);
+}
+.ticker__track {
+  display: flex;
+  width: max-content;
+  animation: ticker-scroll 9s linear infinite;
+  will-change: transform;
+}
+.ticker__group { display: flex; flex-shrink: 0; }
+.ticker__item {
   display: inline-flex;
   align-items: center;
-  padding: 0 1.1rem;
-  font-size: 0.7rem;
-  font-weight: 800;
+  padding: 0 0.9rem;
+  white-space: nowrap;
+  font-size: 0.68rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  white-space: nowrap;
 }
-.marquee--open   { background: #e6f2dd; color: #2f5d47; }
-.marquee--closed { background: #fef2f2; color: #b91c1c; }
-@keyframes marquee-scroll {
+.ticker--open   .ticker__item { color: #64748b; }
+.ticker--closed .ticker__item { color: #b91c1c; }
+@keyframes ticker-scroll {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .marquee__track { animation: none; }
+  .ticker__track { animation: none; }
 }
