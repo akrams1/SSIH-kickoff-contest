@@ -8,6 +8,9 @@ import { Lock, X, Maximize2 } from 'lucide-react';
 import { Dancing_Script } from 'next/font/google';
 import StyledQR from './StyledQR';
 import DotGrid from './DotGrid';
+import PhotoUpload from './PhotoUpload';
+import { db } from '@/lib/firebase';
+import { doc, onSnapshot } from 'firebase/firestore';
 
 const dancingScript = Dancing_Script({
   subsets: ['latin'],
@@ -18,11 +21,21 @@ export default function Home() {
   const [siteURL, setSiteURL] = useState('');
   const [mounted, setMounted] = useState(false);
   const [showBigQR, setShowBigQR] = useState(false);
+  const [votingOpen, setVotingOpen] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
     setSiteURL(window.location.origin);
+
+    // Photo uploads follow the event's open/closed flag, same as voting.
+    // Fail-open: missing doc or open !== false => open.
+    const unsub = onSnapshot(
+      doc(db, 'config', 'event'),
+      (snap) => setVotingOpen(!snap.exists() || snap.data().open !== false),
+      (err) => console.error('Config listener error:', err)
+    );
+    return () => unsub();
   }, []);
 
   const handleStart = (e) => {
@@ -61,12 +74,17 @@ export default function Home() {
           </p>
 
           {/* Vote CTA — layered pushable button */}
-          <div className="w-full mb-10 flex justify-center">
+          <div className="w-full mb-5 flex justify-center">
             <button onClick={handleStart} className="vote-push select-none">
               <span className="vote-push__shadow" />
               <span className="vote-push__edge" />
               <span className="vote-push__front">LET&rsquo;S VOTE</span>
             </button>
+          </div>
+
+          {/* Attendees can contribute their own photos of the night */}
+          <div className="w-full mb-10">
+            <PhotoUpload open={votingOpen} />
           </div>
 
           {/* 📱 QR Code */}
