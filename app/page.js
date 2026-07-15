@@ -56,10 +56,12 @@ export default function Home() {
             Costume Contest &middot; vote for the best fit
           </p>
 
-          {/* Vote CTA — arcade kick button */}
+          {/* Vote CTA — layered pushable button */}
           <div className="w-full mb-12 flex justify-center">
-            <button onClick={handleStart} className="vote-btn select-none">
-              LET&rsquo;S VOTE
+            <button onClick={handleStart} className="vote-push select-none">
+              <span className="vote-push__shadow" />
+              <span className="vote-push__edge" />
+              <span className="vote-push__front">LET&rsquo;S VOTE</span>
             </button>
           </div>
 

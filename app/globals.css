@@ -12,25 +12,24 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* Palette — anchored on the supplied colours:
-     #E6F2DD (50) · #B1D3B9 (200) · #88BDA4 (300) · #659287 (500)
-   100 and 400 are interpolated between them. 600–950 are derived by darkening
-   #659287 along its own hue, because the supplied set tops out at 3.49:1 on
-   white — not enough for body text (needs 4.5) or a reliable QR. The derived
-   darks keep text and the QR readable while staying in the same colour family.
-   Remaps every `green-*` utility across the whole app. */
+/* Palette — light #E6F2DD, dark #88BDA4 (stops 50 and 300).
+   100/200 are interpolated between them. 400–950 are derived by darkening
+   #88BDA4 along its own hue (H152 S29), because #88BDA4 is only 2.13:1 on
+   white — far below the 4.5 body text needs, and a QR at that contrast fails
+   to scan the moment there's dim light or glare (measured: 0/5 vs 5/5).
+   Surfaces stay light; the derived darks carry text and the QR. */
 @theme {
   --color-green-50:  #e6f2dd;
-  --color-green-100: #cce2cb;
-  --color-green-200: #b1d3b9;
+  --color-green-100: #c6e0ca;
+  --color-green-200: #a7ceb7;
   --color-green-300: #88bda4;
-  --color-green-400: #76a896;
-  --color-green-500: #659287;
-  --color-green-600: #49776b;
-  --color-green-700: #366056;
-  --color-green-800: #284b42;
-  --color-green-900: #1d3831;
-  --color-green-950: #10201c;
+  --color-green-400: #60a987;
+  --color-green-500: #4c9070;
+  --color-green-600: #3c745a;
+  --color-green-700: #2f5d47;
+  --color-green-800: #244938;
+  --color-green-900: #1b372a;
+  --color-green-950: #102119;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -46,37 +45,82 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Vote CTA — arcade "kick" button. Two colors: face + shadow. No glow.
-   Fixed size so the letter-spacing press can't reflow.
-   Adapted from Uiverse by btongheng. */
-.vote-btn {
-  --btn: #659287;
-  --btn-shadow: #49776b;
+/* Vote CTA — layered "pushable" button (adapted from Uiverse by PriyanshuGupta28).
+   Class names are namespaced: the original uses .shadow/.edge/.front, and
+   `.shadow` would collide with Tailwind's own shadow utility.
+   Front is #88BDA4 with dark-green ink — white text on it is only 2.13:1. */
+.vote-push {
+  position: relative;
+  background: transparent;
+  padding: 0;
+  border: none;
   cursor: pointer;
-  width: 11.5rem;
-  height: 3rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  font-weight: 800;
-  letter-spacing: 2px;
-  color: #fff;
-  background: var(--btn);
-  border: 2px solid var(--btn-shadow);
-  border-radius: 0.75rem;
-  box-shadow: 0 8px 0 var(--btn-shadow);
-  transform: skew(-10deg);
-  transition: all 0.1s ease;
-  -webkit-tap-highlight-color: transparent;
+  outline-offset: 4px;
+  outline-color: #2f5d47;
+  transition: filter 250ms;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   touch-action: manipulation;
-  user-select: none;
 }
-.vote-btn:active {
-  letter-spacing: 0px;
-  transform: skew(-10deg) translateY(8px);
-  box-shadow: 0 0 0 var(--btn-shadow);
+.vote-push__shadow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: #83af9a;
+  border-radius: 8px;
+  filter: blur(2px);
+  will-change: transform;
+  transform: translateY(2px);
+  transition: transform 600ms cubic-bezier(0.3, 0.7, 0.4, 1);
 }
+.vote-push__edge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  border-radius: 8px;
+  background: linear-gradient(
+    to right,
+    #529877 0%,
+    #67ad8c 8%,
+    #529877 92%,
+    #447e63 100%
+  );
+}
+.vote-push__front {
+  display: block;
+  position: relative;
+  border-radius: 8px;
+  background: #88bda4;
+  padding: 16px 32px;
+  color: #1b372a;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-size: 1rem;
+  transform: translateY(-4px);
+  transition: transform 600ms cubic-bezier(0.3, 0.7, 0.4, 1);
+}
+.vote-push:hover { filter: brightness(105%); }
+.vote-push:hover .vote-push__front {
+  transform: translateY(-6px);
+  transition: transform 250ms cubic-bezier(0.3, 0.7, 0.4, 1.5);
+}
+.vote-push:active .vote-push__front {
+  transform: translateY(-2px);
+  transition: transform 34ms;
+}
+.vote-push:hover .vote-push__shadow {
+  transform: translateY(4px);
+  transition: transform 250ms cubic-bezier(0.3, 0.7, 0.4, 1.5);
+}
+.vote-push:active .vote-push__shadow {
+  transform: translateY(1px);
+  transition: transform 34ms;
+}
+.vote-push:focus:not(:focus-visible) { outline: none; }
 
 /* Subtle, GPU-friendly entrance — opacity + small translate only. */
 @keyframes fadeUp {
@@ -89,9 +133,8 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .fade-up { animation: none; }
-  .vote-btn,
-  .vote-btn:hover,
-  .vote-btn:active { transition: none; }
+  .vote-push__front,
+  .vote-push__shadow { transition: none; }
 }
 
 /* Admin segmented toggle — subtle keycap press in the app's white/slate tones.
@@ -125,7 +168,7 @@ body {
 .seg-btn.seg-active {
   translate: 0 3px;
   letter-spacing: 0.02em;
-  color: #366056;
+  color: #2f5d47;
   background-color: #fbfdfa;
   box-shadow: inset 0 1px 0 0 #ffffff, 0 1px 0 0 #f1f5f9,
     0 1px 0 0 #e9eef4, 0 1px 0 0 #e2e8f0, 0 1px 0 0 #dbe2ea,
