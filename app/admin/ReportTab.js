@@ -2,12 +2,14 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { db } from '@/lib/firebase';
-import { collection, query, orderBy, onSnapshot, doc, setDoc, getDoc } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
 import { rankSort } from '@/lib/rank';
 import { buildReportDoc } from '@/lib/report';
 import { generateQrDataUrl } from '@/lib/qr';
+import { urlToDataUrl } from '@/lib/upload';
+import { cldThumb } from '@/lib/img';
 import {
-  FileText, Loader2, Save, ImagePlus, X, Plus, Trash2, CheckCircle, AlertCircle,
+  FileText, Loader2, Save, ImagePlus, X, Plus, Trash2, CheckCircle, AlertCircle, Camera, Check,
 } from 'lucide-react';
 
 const BLANK = {
@@ -57,7 +59,9 @@ export default function ReportTab() {
   const [form, setForm] = useState(BLANK);
   const [contestants, setContestants] = useState([]);
   const [attendees, setAttendees] = useState([]);
-  const [photos, setPhotos] = useState([]); // { id, dataUrl, name }
+  const [photos, setPhotos] = useState([]); // from this PC: { id, dataUrl, name }
+  const [attendeePhotos, setAttendeePhotos] = useState([]); // from Firestore
+  const [picked, setPicked] = useState([]); // selected attendee photo ids
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
@@ -85,6 +89,11 @@ export default function ReportTab() {
       (snap) => setAttendees(snap.docs.map((x) => ({ id: x.id, ...x.data() }))),
       (err) => console.error('Attendees listener error:', err)
     );
+    const unsubP = onSnapshot(
+      query(collection(db, 'photos'), orderBy('createdAt', 'desc')),
+      (snap) => setAttendeePhotos(snap.docs.map((x) => ({ id: x.id, ...x.data() }))),
+      (err) => console.error('Photos listener error:', err)
+    );
 
     getDoc(doc(db, 'report', 'draft'))
       .then((s) => {
@@ -96,6 +105,7 @@ export default function ReportTab() {
     return () => {
       unsubC();
       unsubA();
+      unsubP();
       if (msgTimer.current) clearTimeout(msgTimer.current);
     };
   }, []);
@@ -146,6 +156,20 @@ export default function ReportTab() {
     e.target.value = '';
   };
 
+  const togglePick = (id) =>
+    setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
+
+  const removeAttendeePhoto = async (id) => {
+    if (!confirm('Delete this photo? It is removed for everyone.')) return;
+    try {
+      await deleteDoc(doc(db, 'photos', id));
+      setPicked((p) => p.filter((x) => x !== id));
+    } catch (err) {
+      console.error(err);
+      say('err', 'Could not delete that photo');
+    }
+  };
+
   const generate = async () => {
     setGenerating(true);
     try {
@@ -179,13 +203,26 @@ export default function ReportTab() {
         console.error('QR render failed, continuing without it', err);
       }
 
+      // Attendee photos live on Cloudinary; pdfmake needs bytes, so fetch the
+      // picked ones back as data URLs (at a sane width, not the original).
+      const pickedUrls = [];
+      for (const id of picked) {
+        const p = attendeePhotos.find((x) => x.id === id);
+        if (!p?.url) continue;
+        try {
+          pickedUrls.push(await urlToDataUrl(cldThumb(p.url, 1200)));
+        } catch (err) {
+          console.error('Could not fetch attendee photo, skipping:', err);
+        }
+      }
+
       const docDef = buildReportDoc({
         ...form,
         contestants,
         residents: attendees.filter((a) => a.type === 'resident').map((a) => a.label),
         visitors: attendees.filter((a) => a.type === 'visitor').map((a) => a.label),
         qrDataUrl,
-        photos: photos.map((p) => p.dataUrl),
+        photos: [...pickedUrls, ...photos.map((p) => p.dataUrl)],
       });
 
       const safe = (form.reportTitle || 'event-report').replace(/[^a-z0-9]+/gi, '-').toLowerCase();
@@ -312,9 +349,63 @@ export default function ReportTab() {
 
       </div>
 
-      {/* Photos */}
+      {/* Photos from attendees */}
       <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-        <h3 className="font-bold text-slate-700 mb-3">Event photos</h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-bold text-slate-700 flex items-center gap-2">
+            <Camera className="w-4 h-4 text-green-600" />
+            From attendees
+          </h3>
+          <span className="text-xs text-slate-500">
+            {attendeePhotos.length === 0
+              ? 'none yet'
+              : `${picked.length} of ${attendeePhotos.length} selected`}
+          </span>
+        </div>
+
+        {attendeePhotos.length === 0 ? (
+          <p className="text-sm text-slate-500 py-6 text-center">
+            Photos guests upload from the voting page will appear here.
+          </p>
+        ) : (
+          <div className="grid grid-cols-3 md:grid-cols-5 gap-2 max-h-72 overflow-y-auto">
+            {attendeePhotos.map((p) => {
+              const on = picked.includes(p.id);
+              return (
+                <div key={p.id} className="relative group aspect-square rounded-lg overflow-hidden bg-slate-100">
+                  <button
+                    type="button"
+                    onClick={() => togglePick(p.id)}
+                    className="absolute inset-0 w-full h-full"
+                    title={on ? 'Deselect' : 'Select for the report'}
+                  >
+                    <img src={cldThumb(p.url, 240)} alt="" className="w-full h-full object-cover" />
+                    {on && (
+                      <span className="absolute inset-0 bg-green-600/35 ring-2 ring-inset ring-green-600 flex items-center justify-center">
+                        <span className="bg-green-600 text-white rounded-full p-1">
+                          <Check className="w-3.5 h-3.5" />
+                        </span>
+                      </span>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => removeAttendeePhoto(p.id)}
+                    className="absolute top-1 right-1 bg-slate-900/70 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-all"
+                    title="Delete for everyone"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Photos from this device */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+        <h3 className="font-bold text-slate-700 mb-3">From this computer</h3>
         <div className="relative">
           <input type="file" accept="image/*" multiple onChange={onPhotos} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
           <div className="border-2 border-dashed border-slate-200 hover:border-green-300 hover:bg-slate-50 rounded-xl p-6 text-center transition-all">
@@ -341,7 +432,7 @@ export default function ReportTab() {
         )}
         {photos.length > 0 && (
           <p className="text-xs text-slate-500 mt-2">
-            {photos.length} photo{photos.length > 1 ? 's' : ''} — these are not saved to the draft, add them
+            {photos.length} added from this computer. These are not saved to the draft, so add them
             just before generating.
           </p>
         )}

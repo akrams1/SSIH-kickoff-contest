@@ -7,6 +7,7 @@ import {
   doc, updateDoc, increment
 } from 'firebase/firestore';
 import { cldThumb } from '@/lib/img';
+import PhotoUpload from './PhotoUpload';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Heart, ArrowLeft, Loader2, Shirt, Check } from 'lucide-react';
@@ -226,6 +227,9 @@ export default function VotePage() {
             })}
           </div>
         )}
+
+        {/* Attendees can contribute their own event photos */}
+        <PhotoUpload open={votingOpen} />
       </div>
 
       {toast && (
