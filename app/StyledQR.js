@@ -2,12 +2,16 @@
 
 import { useEffect, useRef } from 'react';
 
-// Verified with zxing-cpp (the decoder family phones use): this config decodes
-// reliably down to ~90px and through heavy blur. Two things carry that:
+// Verified with zxing-cpp (the decoder family phones use). At these values the
+// code still decodes at 100px, 45deg rotation, blur r=3, low contrast, camera
+// noise and perspective tilt.
 //   - errorCorrectionLevel 'H' (30% recovery) — mandatory, the logo destroys data
 //   - hideBackgroundDots — the logo art has transparent gaps; without this,
-//     QR dots show through them and muddy the finder pattern.
-// Don't raise imageSize past ~0.4 without re-testing a real scan.
+//     QR dots show through the ball's panels and muddy it.
+//   - imageSize 0.55 is the practical ceiling: the library quantises the logo to
+//     whole modules and clamps it to the error-correction budget, so 0.6 renders
+//     identically to 0.55. Raising it further does nothing.
+// Re-test a real scan if you change the logo art or these numbers.
 const qrOptions = (data, size) => ({
   width: size,
   height: size,
@@ -22,8 +26,8 @@ const qrOptions = (data, size) => ({
   backgroundOptions: { color: '#ffffff' },
   imageOptions: {
     hideBackgroundDots: true,
-    imageSize: 0.4,
-    margin: 6,
+    imageSize: 0.55,
+    margin: 4,
     crossOrigin: 'anonymous',
   },
 });
