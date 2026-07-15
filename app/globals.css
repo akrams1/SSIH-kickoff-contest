@@ -177,3 +177,46 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .seg-btn { transition: none; }
 }
+
+/* Voting-status ticker. Two identical groups + translateX(-50%) = seamless
+   loop with no JS. Hover pauses; reduced-motion stops it and the text still
+   reads, so the status is never animation-dependent. */
+.marquee {
+  position: relative;
+  overflow: hidden;
+  border-radius: 999px;
+  padding: 0.45rem 0;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
+          mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
+}
+.marquee__track {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 24s linear infinite;
+  will-change: transform;
+}
+.marquee__group {
+  display: flex;
+  flex-shrink: 0;
+}
+.marquee__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0 1.1rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+}
+.marquee:hover .marquee__track { animation-play-state: paused; }
+.marquee--open   { background: #e6f2dd; color: #2f5d47; }
+.marquee--closed { background: #fef2f2; color: #b91c1c; }
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee__track { animation: none; }
+}

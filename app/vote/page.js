@@ -29,6 +29,32 @@ function hashKey(id, seed) {
   return (h ^ seed) >>> 0;
 }
 
+// Scrolling voting-status ticker. Renders the same group twice so the
+// translateX(-50%) loop is seamless; the second copy is aria-hidden so screen
+// readers hear the status once.
+function StatusTicker({ open }) {
+  const label = open ? 'Voting is open' : 'Voting has closed';
+  const Icon = open ? Heart : Lock;
+  const group = (hidden) => (
+    <div className="marquee__group" aria-hidden={hidden || undefined}>
+      {Array.from({ length: 6 }).map((_, i) => (
+        <span className="marquee__item" key={i}>
+          <Icon className={`w-3 h-3 flex-shrink-0 ${open ? 'fill-current' : ''}`} />
+          {label}
+        </span>
+      ))}
+    </div>
+  );
+  return (
+    <div className={`marquee ${open ? 'marquee--open' : 'marquee--closed'}`} role="status">
+      <div className="marquee__track">
+        {group(false)}
+        {group(true)}
+      </div>
+    </div>
+  );
+}
+
 export default function VotePage() {
   const [contestants, setContestants] = useState([]);
   const [votedFor, setVotedFor] = useState(null); // single id, or null
@@ -108,29 +134,27 @@ export default function VotePage() {
     <div className="min-h-screen bg-slate-50 p-6 md:p-12">
       <div className="max-w-7xl mx-auto">
 
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
-          <div>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+          <div className="md:flex-shrink-0">
             <Link href="/" className="inline-flex items-center text-slate-500 hover:text-slate-600 mb-4 transition-colors font-medium text-sm">
               <ArrowLeft className="w-4 h-4 mr-2" /> Home
             </Link>
             <h1 className="text-3xl md:text-4xl font-bold text-green-700 tracking-tight">Costume Gallery</h1>
-            <p className="text-slate-500 mt-1">
-              {votingOpen ? 'Pick your favorite — one vote each.' : 'Voting has closed.'}
-            </p>
+            {votingOpen && (
+              <p className="text-slate-500 mt-1">Pick your favorite — one vote each.</p>
+            )}
           </div>
 
-          <div className="mt-4 md:mt-0 px-4 py-2 bg-white rounded-full border border-slate-200 text-slate-600 text-sm font-medium flex items-center gap-2 shadow-sm">
+          {/* Scrolling voting-status ticker */}
+          <div className="md:flex-1 md:mx-6 min-w-0 order-last md:order-none">
+            <StatusTicker open={votingOpen} />
+          </div>
+
+          <div className="px-4 py-2 bg-white rounded-full border border-slate-200 text-slate-600 text-sm font-medium flex items-center gap-2 shadow-sm self-start md:self-auto flex-shrink-0">
             <Heart className="w-4 h-4 text-green-600 fill-green-600" />
             <span>{totalVotes} total votes</span>
           </div>
         </div>
-
-        {!votingOpen && (
-          <div className="mb-8 inline-flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 rounded-full px-4 py-2 font-semibold">
-            <Lock className="w-4 h-4 flex-shrink-0" />
-            Voting has closed.
-          </div>
-        )}
 
         {ordered.length === 0 ? (
           <div className="text-center py-20 bg-white/50 rounded-3xl border border-dashed border-slate-200">
@@ -149,8 +173,8 @@ export default function VotePage() {
                 <div
                   key={contestant.id}
                   style={{ animationDelay: `${Math.min(idx, 8) * 60}ms` }}
-                  className={`fade-up group bg-white rounded-2xl overflow-hidden shadow-sm border transition-all duration-300 ${
-                    isMine ? 'border-green-400 ring-2 ring-green-100' : 'border-slate-100 hover:shadow-xl hover:-translate-y-1'
+                  className={`fade-up group bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 transition-all duration-300 ${
+                    isMine ? '' : 'hover:shadow-xl hover:-translate-y-1'
                   }`}
                 >
                   <div className="relative aspect-[4/5] bg-slate-100">
